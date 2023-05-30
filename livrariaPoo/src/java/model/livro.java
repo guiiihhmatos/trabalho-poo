@@ -15,12 +15,12 @@ public class Livro {
     private String titulo;
     private String autor;
     private String editora;
-    private String ano_publicacao;
+    private int ano_publicacao;
     private String isbn;
     private String descricao;
-    private String disponibilidade;
+    private Boolean disponibilidade;
 
-    public Livro(long rowId, String titulo, String autor, String editora, String ano_publicacao, String isbn, String descricao, String disponibilidade) {
+    public Livro(long rowId, String titulo, String autor, String editora, Integer ano_publicacao, String isbn, String descricao, Boolean disponibilidade) {
         this.rowId = rowId;
         this.titulo = titulo;
         this.autor = autor;
@@ -38,8 +38,8 @@ public class Livro {
                 +"editora VARCHAR(40) NOT NULL,"
                 +"ano_publicacao datetime NOT NULL,"
                 +"isbn VARCHAR(13) UNIQUE NOT NULL,"
-                +"descricao VARCHAR(150) NOT NULL,"
-                +"disponibilidade VARCHAR(40) NOT NULL"
+                +"descricao VARCHAR(300) NOT NULL,"
+                +"disponibilidade boolean"
                 +");";      
     }
     
@@ -48,7 +48,7 @@ public class Livro {
         ArrayList<Livro> list = new ArrayList<>();
         Connection conexao = AppListener.getConnection();
         Statement stmt = conexao.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT rowid, * from users");
+        ResultSet rs = stmt.executeQuery("SELECT rowid, * from livro WHERE dispobilidade = true ");
         
         while(rs.next())
         {
@@ -56,10 +56,10 @@ public class Livro {
             String titulo = rs.getString("titulo");
             String autor = rs.getString("autor");
             String editora = rs.getString("editora");
-            String ano_publicacao = rs.getString("ano_publicacao");
+            int ano_publicacao = rs.getInt("ano_publicacao");
             String isbn = rs.getString("isbn");
             String descricao = rs.getString("descricao");
-            String disponibilidade = rs.getString("disponibilidade");
+            Boolean disponibilidade = rs.getBoolean("disponibilidade");
             
             
             list.add(new Livro(rowId, titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade));
@@ -71,6 +71,37 @@ public class Livro {
         
         return list;
     }
+     
+     public static ArrayList<Livro> getAllLivros() throws Exception{
+        
+        ArrayList<Livro> list = new ArrayList<>();
+        Connection conexao = AppListener.getConnection();
+        Statement stmt = conexao.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT rowid, * from livro ");
+        
+        while(rs.next())
+        {
+            long rowId = rs.getLong("rowid");
+            String titulo = rs.getString("titulo");
+            String autor = rs.getString("autor");
+            String editora = rs.getString("editora");
+            int ano_publicacao = rs.getInt("ano_publicacao");
+            String isbn = rs.getString("isbn");
+            String descricao = rs.getString("descricao");
+            boolean disponibilidade = rs.getBoolean("disponibilidade");
+            
+            
+            list.add(new Livro(rowId, titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade));
+        }
+        
+        rs.close();
+        stmt.close();
+        conexao.close();
+        
+        return list;
+    }
+     
+     
     
     public static Livro getLivro(String isbn) throws Exception{
         
@@ -88,9 +119,9 @@ public class Livro {
             String titulo = rs.getString("titulo");
             String autor = rs.getString("autor");
             String editora = rs.getString("editora");
-            String ano_publicacao = rs.getString("ano_publicacao");
+            int ano_publicacao = rs.getInt("ano_publicacao");
             String descricao = rs.getString("descricao");
-            String disponibilidade = rs.getString("disponibilidade");
+            Boolean disponibilidade = rs.getBoolean("disponibilidade");
             
             livro = new Livro(rowId, titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade);
             
@@ -104,10 +135,10 @@ public class Livro {
         return livro;
     }
     
-    public static void insertLivro(String titulo, String autor, String editora, String ano_publicacao, String isbn, String descricao, String disponibilidade) throws Exception{
+    public static void insertLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
         
         Connection conexao = AppListener.getConnection();
-        String sql = "INSERT INTO users(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade)"
+        String sql = "INSERT INTO livro(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade)"
                 + "VALUES (?,?,?,?,?,?,?)";
         
         PreparedStatement stmt = conexao.prepareStatement(sql);
@@ -115,10 +146,10 @@ public class Livro {
         stmt.setString(1, titulo);
         stmt.setString(2, autor);
         stmt.setString(3, editora);
-        stmt.setString(4, ano_publicacao);
+        stmt.setInt(4, ano_publicacao);
         stmt.setString(5, isbn);
         stmt.setString(6, descricao);
-        stmt.setString(7, disponibilidade);
+        stmt.setBoolean(7, disponibilidade);
         
         stmt.execute();
         conexao.close();
@@ -126,19 +157,19 @@ public class Livro {
         
     }
     
-    public static void updateLivro(String titulo, String autor, String editora, String ano_publicacao, String isbn, String descricao, String disponibilidade) throws Exception{
+    public static void updateLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
         
         Connection conexao = AppListener.getConnection();
-        String sql = "UPDATE users SET titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade WHERE isbn=?";
+        String sql = "UPDATE livro SET titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade WHERE isbn=?";
         
         PreparedStatement stmt = conexao.prepareStatement(sql);
         
         stmt.setString(1, titulo);
         stmt.setString(2, autor);
         stmt.setString(3, editora);
-        stmt.setString(4, ano_publicacao);
+        stmt.setInt(4, ano_publicacao);
         stmt.setString(5, descricao);
-        stmt.setString(6, disponibilidade);
+        stmt.setBoolean(6, disponibilidade);
         stmt.setString(7, isbn);
         
         stmt.execute();
@@ -192,11 +223,11 @@ public class Livro {
         this.editora = editora;
     }
 
-    public String getAno_publicacao() {
+    public int getAno_publicacao() {
         return ano_publicacao;
     }
 
-    public void setAno_publicacao(String ano_publicacao) {
+    public void setAno_publicacao(int ano_publicacao) {
         this.ano_publicacao = ano_publicacao;
     }
 
@@ -216,11 +247,11 @@ public class Livro {
         this.descricao = descricao;
     }
 
-    public String isDisponibilidade() {
+    public Boolean isDisponibilidade() {
         return disponibilidade;
     }
 
-    public void setDisponibilidade(String disponibilidade) {
+    public void setDisponibilidade(Boolean disponibilidade) {
         this.disponibilidade = disponibilidade;
     }
     
