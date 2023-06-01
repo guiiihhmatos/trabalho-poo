@@ -1,10 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
-import java.util.Date;
 import java.util.ArrayList;
 import java.sql.*;
 import web.AppListener;
@@ -257,7 +252,5 @@ public class Livro {
 
     public void setDisponibilidade(Boolean disponibilidade) {
         this.disponibilidade = disponibilidade;
-    }
-    
-    
+    }       
 }

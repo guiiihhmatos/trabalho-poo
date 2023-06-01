@@ -24,6 +24,12 @@ public class User {
         this.passwordHash = passwordHash;
     }
     
+    public User( String login, String name, String role) {        
+        this.name = name;
+        this.login = login;
+        this.role = role;        
+    }
+    
     public static String getCreateStatement(){
         return "CREATE TABLE IF NOT EXISTS users("
                 +"login VARCHAR(50) UNIQUE NOT NULL,"
@@ -174,7 +180,5 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
-    }
-    
-    
+    }      
 }
