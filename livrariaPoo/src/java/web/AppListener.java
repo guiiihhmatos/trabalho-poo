@@ -42,6 +42,9 @@ public class AppListener implements ServletContextListener{
                 
                 User.insertUser("guilherme", "Guilherme Matos Santana", "USER", "1234");
                 initializelog += "Guilherme added";
+                
+                User.insertUser("raquel", "Raquel Facchini Batista Franco", "USER", "12345");
+                initializelog += "Raquel added";
             }
             initializelog += "done;";
             
