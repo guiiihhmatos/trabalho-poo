@@ -1,13 +1,11 @@
 package web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import model.Livro;
 import model.User;
 import org.json.JSONArray;
@@ -16,54 +14,176 @@ import org.json.JSONObject;
 @WebServlet(name = "ApiServlet", urlPatterns = {"/api/*"})
 public class ApiServlet extends HttpServlet {
     
-    private JSONObject getJSONBody(BufferedReader reader) throws Exception{
-        
-        StringBuilder buffer = new StringBuilder();
-        String line = null;
-        while((line = reader.readLine()) != null)
-        {
-            buffer.append(line);
-        }
-        
-        return new JSONObject(buffer.toString());
-    }
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {   
         response.setContentType("application/json;charset=UTF-8");
         JSONObject file = new JSONObject();
-        
-        try{
-         
-            if(request.getRequestURI().endsWith("/api/session")){
-                
+        String path = request.getPathInfo();
+        try {
+            if (path.endsWith("session")) {
                 processSession(file, request, response);
-                
-            }else if(request.getRequestURI().endsWith("/api/users")){
-                
+            } else if (path.endsWith("users")) {
                 processUsers(file, request, response);
-                
-            } else if(request.getRequestURI().endsWith("/api/livros")){
-                
+            } else if (path.endsWith("livros")) {
                 processLivros(file, request, response);
-                
             } else {
-                
-                response.sendError(400, "Invalid URL");
-                file.put("error", "Invalid URL");
-                
+               response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+               file.put("error", "Invalid URL");
             }
-                
-        }catch(Exception ex)
-        {
-            response.sendError(500, "Internal error: " + ex.getLocalizedMessage());
+        } catch (Exception ex) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Internal error: " + ex.getLocalizedMessage());
         }
-        
-        response.getWriter().print(file.toString());
-        
+        response.getWriter().print(file.toString());        
     }
 
-    @Override
+    private void processSession(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String method = request.getMethod();
+        if (method.equals("GET")) {
+            handleSessionGet(file, request, response);
+        } else if (method.equals("PUT")) {
+            handleSessionPut(file, request, response);
+        } else if (method.equals("DELETE")) {
+            handleSessionDelete(file, request, response);
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }        
+    }
+    
+    private void processUsers(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String method = request.getMethod();
+        if (method.equals("GET")) {
+            handleUserGet(file, request, response);
+        } else if (method.equals("PUT")) {
+            handleUserPut(file, request, response);
+        } else if (method.equals("DELETE")) {
+            handleUserDelete(file, request, response);
+        } else if (method.equals("POST")) {
+            handleUserPost(file, request, response);            
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }          
+    }
+
+    private void processLivros(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        String method = request.getMethod();
+        if (method.equals("GET")) {
+            handleLivrosGet(file, request, response);
+        } else if (method.equals("PUT")) {
+            handleLivrosPut(file, request, response);
+        } else if (method.equals("DELETE")) {
+            handleLivrosDelete(file, request, response);
+        } else if (method.equals("POST")) {
+            handleLivrosPost(file, request, response);            
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }   
+    }
+       
+    private void handleSessionGet(JSONObject file, HttpServletRequest request, HttpServletResponse response) {
+        User usuario = (User) request.getSession().getAttribute("user");
+        request.getSession().setAttribute("user", usuario);
+        file.put("id", usuario.getId());
+        file.put("login", usuario.getLogin());
+        file.put("name", usuario.getName());
+        file.put("role", usuario.getRole());
+        file.put("passwordHash", usuario.getPasswordHash());
+        file.put("message", "Logged in");               
+    }
+
+    private void handleSessionDelete(JSONObject file, HttpServletRequest request, HttpServletResponse response) {
+        request.getSession().removeAttribute("user");
+        file.put("message", "Logged out");
+    }
+
+    private void handleSessionPut(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {  
+        JSONObject body = JSONObjectBuilder.createJSONObject(HttpHelper.getHttpBody(request.getReader()));
+        String login = body.getString("login");
+        String password = body.getString("password");
+
+        User usuario = User.getUser(login, password);
+
+        if(usuario == null)
+        {            
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("Login or password incorreto.");
+
+        } else 
+        {           
+            file.put("id", usuario.getId());
+            file.put("login", usuario.getLogin());
+            file.put("name", usuario.getName());
+            file.put("role", usuario.getRole());
+           // file.put("passwordHash", usuario.getPasswordHash());
+            file.put("message", "Logged in");
+        }                    
+    }
+
+    private void handleUserGet(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception {
+         file.put("list", new JSONArray(User.getUsers()));
+    }
+    private void handleUserDelete(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Long id = Long.parseLong(request.getParameter("id"));
+        User.deleteUser(id);
+    }
+
+    private void handleUserPost(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {
+        JSONObject body = JSONObjectBuilder.createJSONObject(HttpHelper.getHttpBody(request.getReader()));
+        String login = body.getString("login");
+        String name = body.getString("name");
+        String role = body.getString("role");
+        String password = body.getString("password");
+        User.insertUser(login, name, role, password);        
+    }
+
+    private void handleUserPut(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {            
+        JSONObject body = JSONObjectBuilder.createJSONObject(HttpHelper.getHttpBody(request.getReader()));
+        String login = body.getString("login");
+        String name = body.getString("name");
+        String role = body.getString("role");
+        String password = body.getString("password");
+        User.updateUser(login, name, role, password);        
+    }
+
+    private void handleLivrosGet(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (request.getParameter("disponivel") != null) {
+            file.put("list", new JSONArray(Livro.getLivros()));
+        } else {
+            file.put("list", new JSONArray(Livro.getAllLivros()));
+        }
+    }
+
+    private void handleLivrosDelete(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Long id = Long.parseLong(request.getParameter("id"));
+        Livro.deleteLivro(id);
+    }
+    
+    private void handleLivrosPut(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {        
+        JSONObject body  = JSONObjectBuilder.createJSONObject(HttpHelper.getHttpBody(request.getReader()));
+        String titulo = body.getString("titulo");
+        String autor = body.getString("autor");
+        String editora = body.getString("editora");
+        int ano_publicacao = body.getInt("ano_publicacao");
+        String isbn = body.getString("isbn");
+        String descricao = body.getString("descricao");
+        Boolean disponibilidade = body.getBoolean("disponibilidade");
+
+        Livro.updateLivro(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade);          
+    }    
+
+    private void handleLivrosPost(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws IOException, Exception {
+        JSONObject body = JSONObjectBuilder.createJSONObject(HttpHelper.getHttpBody(request.getReader()));
+        String titulo = body.getString("titulo");
+        String autor = body.getString("autor");
+        String editora = body.getString("editora");
+        int ano_publicacao = body.getInt("ano_publicacao");
+        String isbn = body.getString("isbn");
+        String descricao = body.getString("descricao");
+        Boolean disponibilidade = body.getBoolean("disponibilidade");
+
+        Livro.insertLivro(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade);
+    }
+    
+    
+ @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
@@ -86,151 +206,5 @@ public class ApiServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-    
-
-    private void processSession(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception{
-        
-        if(request.getMethod().toLowerCase().equals("put"))
-        {
-            
-            JSONObject body = getJSONBody(request.getReader());
-            String login = body.getString("login");
-            String password = body.getString("password");
-            
-            User usuario = User.getUser(login, password);
-            
-            if(usuario == null)
-            {
-                response.sendError(403, "Login or password incorrects");
-            } else 
-            {
-                request.getSession().setAttribute("user", usuario);
-                file.put("id", usuario.getId());
-                file.put("login", usuario.getLogin());
-                file.put("name", usuario.getName());
-                file.put("role", usuario.getRole());
-                file.put("passwordHash", usuario.getPasswordHash());
-                file.put("message", "Logged in");
-                
-            }
-            
-        } else if(request.getMethod().toLowerCase().equals("delete"))
-        {
-            
-            request.getSession().removeAttribute("user");
-            file.put("message", "Logged out");
-            
-        } else if(request.getMethod().toLowerCase().equals("get"))
-        {
-            
-            if(request.getSession().getAttribute("user") == null)
-            {
-                response.sendError(403, "No session");
-                file.put("error", "No session");
-            } else 
-            {
-                User usuario = (User) request.getSession().getAttribute("user");
-                request.getSession().setAttribute("user", usuario);
-                file.put("id", usuario.getId());
-                file.put("login", usuario.getLogin());
-                file.put("name", usuario.getName());
-                file.put("role", usuario.getRole());
-                file.put("passwordHash", usuario.getPasswordHash());
-                file.put("message", "Logged in");
-                
-            }
-            
-        } else
-        {
-            response.sendError(405, "Method not allowed");
-        }
     }
-
-    private void processUsers(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception{
-        
-        if(request.getSession().getAttribute("user") == null)
-        {
-            response.sendError(401, "Unauthorized: no session");
-        }else if(!((User) request.getSession().getAttribute("user")).getRole().equals("ADMIN"))
-        {
-            response.sendError(401, "Unauthorized: only admin can manage users");
-        }else if(request.getMethod().toLowerCase().equals("get"))
-        {
-            file.put("list", new JSONArray(User.getUsers()));
-        }else if(request.getMethod().toLowerCase().equals("post"))
-        {
-            JSONObject body = getJSONBody(request.getReader());
-            String login = body.getString("login");
-            String name = body.getString("name");
-            String role = body.getString("role");
-            String password = body.getString("password");
-            User.insertUser(login, name, role, password);
-        }else if(request.getMethod().toLowerCase().equals("put"))
-        {
-            JSONObject body = getJSONBody(request.getReader());
-            String login = body.getString("login");
-            String name = body.getString("name");
-            String role = body.getString("role");
-            String password = body.getString("password");
-            User.updateUser(login, name, role, password);
-        }else if(request.getMethod().toLowerCase().equals("delete"))
-        {
-            Long id = Long.parseLong(request.getParameter("id"));
-            User.deleteUser(id);
-        } else {
-            
-            response.sendError(405, "Method not allowed");
-            
-        }
-    }
-
-    private void processLivros(JSONObject file, HttpServletRequest request, HttpServletResponse response) throws Exception{
-        
-        if(request.getSession().getAttribute("user") == null)
-        {
-            response.sendError(401, "Unauthorized: no session");
-        }else if(request.getMethod().toLowerCase().equals("get"))
-        {
-            if(request.getParameter("disponivel") != null)
-            {
-                file.put("list", new JSONArray(Livro.getLivros()));
-            }else {
-                file.put("list", new JSONArray(Livro.getAllLivros()));
-            }
-        }else if(request.getMethod().toLowerCase().equals("post"))
-        {
-            JSONObject body = getJSONBody(request.getReader());
-            String titulo = body.getString("titulo");
-            String autor = body.getString("autor");
-            String editora = body.getString("editora");
-            int ano_publicacao = body.getInt("ano_publicacao");
-            String isbn = body.getString("isbn");
-            String descricao = body.getString("descricao");
-            Boolean disponibilidade = body.getBoolean("disponibilidade");
-            
-            Livro.insertLivro(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade);
-        }else if(request.getMethod().toLowerCase().equals("put"))
-        {
-            JSONObject body = getJSONBody(request.getReader());
-            String titulo = body.getString("titulo");
-            String autor = body.getString("autor");
-            String editora = body.getString("editora");
-            int ano_publicacao = body.getInt("ano_publicacao");
-            String isbn = body.getString("isbn");
-            String descricao = body.getString("descricao");
-            Boolean disponibilidade = body.getBoolean("disponibilidade");
-            
-            Livro.updateLivro(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade);
-        }else if(request.getMethod().toLowerCase().equals("delete"))
-        {
-            Long id = Long.parseLong(request.getParameter("id"));
-            Livro.deleteLivro(id);
-        } else {
-            response.sendError(405, "Method not allowed");
-            file.put("error", "Method not allowed");
-        }
-            
-    }
-
 }

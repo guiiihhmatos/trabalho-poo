@@ -1,0 +1,81 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
+<%@ page pageEncoding="UTF-8"%>
+<%@ page import="web.HttpHelper" %>
+<%@ page import="model.User" %>
+<%@ page import="web.UsuarioNaoAutenticadoException"%>
+<%@ page import="org.json.JSONObject"%>
+<%
+	if(application.getAttribute("listaUsers")==null){
+		application.setAttribute("listaUsers", new ArrayList());
+	}
+	List listaUsersArray = (ArrayList) application.getAttribute("listaUsers");	
+	if(request.getParameter("session-submit")!=null){
+            User user = null;
+            try {
+                String login = request.getParameter("session-login");
+                String password = request.getParameter("session-pass");
+                String resp = HttpHelper.makePutRequest(login, password);                
+                JSONObject jObj = new JSONObject(resp);
+                user = new User(jObj.getString("login"),
+                    jObj.getString("name"),
+                    jObj.getString("role")                             
+                );                
+                request.getSession(true).setAttribute("user", user);
+                listaUsersArray.add((User)session.getAttribute("user"));
+            } catch (UsuarioNaoAutenticadoException una) {                
+                // Armazena a mensagem de erro em um atributo de escopo de solicitação
+                request.setAttribute("SC_FORBIDDEN", una.getMessage());
+            } catch (Exception e) {
+                out.println("An error occurred: " + e.getMessage());
+            }			
+	}else if(request.getParameter("session-out")!= null){
+		listaUsersArray.remove(session.getAttribute("user"));
+		session.removeAttribute("user");
+		response.sendRedirect(request.getRequestURI());
+	}
+	
+	User user = (User) session.getAttribute("user");
+	
+%>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="${pageContext.request.contextPath}/index.jsp">
+    	<i class="bi bi-people-fill"></i>
+    	Livraria App</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/index.jsp">Início</a>
+        </li>
+        <%if(user!=null && user.getRole().equals("ADMIN")){ %>
+            <li class="nav-item">
+              <a class="nav-link" href="${pageContext.request.contextPath}/users.jsp">Users</a>
+            </li>
+        <%}%>
+      </ul>
+      <%if(user!=null){ %>
+      <form class="d-flex">
+      <span class="navbar-brand m-2 h1">
+		Olá, <%=user.getName()%>
+      </span>
+        <button class="btn btn-outline-success" type="submit" name="session-out">Sair</button>
+      </form>
+      <%} %>
+    </div>
+  </div>
+</nav>
+<%if(user==null){%>
+	<div style="m-2">
+		<%@include file="login-form.jspf" %>
+	</div>
+        <!-- Exibição da mensagem de erro -->
+        <div class="error-message">
+            <%-- Recupera a mensagem de erro do atributo de escopo de solicitação --%>
+            ${requestScope.SC_FORBIDDEN}
+        </div>
+                
+<% } %>
