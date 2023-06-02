@@ -3,7 +3,7 @@
 <html>
 <head>
 <%@include file="WEB-INF/jspf/html-head-libs.jspf"%>
-<title>Index - Livraria Web</title>
+<title>Livraria Web</title>
 </head>
 <body>
 	<%@include file="WEB-INF/jspf/navbar.jspf"%>

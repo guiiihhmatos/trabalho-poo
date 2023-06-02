@@ -29,7 +29,7 @@ public class RequestUtils {
         }
     }
     
-        public static String makePutRequest(String login, String password) throws IOException, Exception {
+    public static String makePutRequest(String login, String password) throws IOException, Exception {
         URL url = new URL("http://localhost:8080/livrariaPoo/api/session");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("PUT");
