@@ -19,10 +19,7 @@
                         <h5><%=((User) u).getName()%></h5>
                     <%}%>
 	</div>
-	<%}else{
-            String contextPath = request.getContextPath();
-            response.sendRedirect(contextPath + "/index.jsp");
-        }%>
+        <%}%>
 	<%@include file="WEB-INF/jspf/html-body-libs.jspf"%>
 </body>
 </html>
