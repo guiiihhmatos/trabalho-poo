@@ -1,19 +1,35 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-package web;
+package web.commons;
 
+import exceptions.UserNaoAutentException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.InputStream;
+import java.util.stream.Collectors;
+import model.User;
 
-public class HttpHelper {
-    public static String makePutRequest(String login, String password) throws IOException, Exception {
+public class RequestUtils {
+
+    private static final Jsonb jsonb = JsonbBuilder.create();
+
+    public static <T> T getRequestBody(HttpServletRequest request, Class<T> type) {
+        try {
+            String json = request.getReader().lines().collect(Collectors.joining());
+            return jsonb.fromJson(json, type);
+        } catch (Exception e) {
+            // Trate qualquer exceção ocorrida durante a desserialização do JSON
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+        public static String makePutRequest(String login, String password) throws IOException, Exception {
         URL url = new URL("http://localhost:8080/livrariaPoo/api/session");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("PUT");
@@ -21,7 +37,8 @@ public class HttpHelper {
         connection.setDoOutput(true);
         connection.setDoInput(true);
 
-        String payload = "{\"login\": \"" + login + "\", \"password\": \"" + password + "\"}";
+        User user = new User(login, password);
+        String payload = JsonUtils.toJson(user);
 
         OutputStream outputStream = connection.getOutputStream();
         outputStream.write(payload.getBytes("UTF-8"));
@@ -45,8 +62,8 @@ public class HttpHelper {
                 reader.close();
                 System.out.println("Mensagem de erro: " + errorMessage.toString());
                 String errorMsg = errorMessage.toString();
-                errorMsg = errorMsg.replace("{", "").replace("}", "");
-                throw new UsuarioNaoAutenticadoException(errorMsg);
+               // errorMsg = errorMsg.replace("{", "").replace("}", "");
+                throw new UserNaoAutentException(errorMsg);
             }
         } 
 
@@ -70,4 +87,3 @@ public class HttpHelper {
         return buffer.toString();
      }    
 }
-

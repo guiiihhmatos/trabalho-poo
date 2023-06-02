@@ -6,10 +6,11 @@ package model;
 
 import java.util.ArrayList;
 import java.sql.*;
-import web.AppListener;
+import java.util.List;
+import web.app.AppListener;
 
 public class User {
-    
+
     private long rowId;
     private String login;
     private String name;
@@ -28,6 +29,14 @@ public class User {
         this.name = name;
         this.login = login;
         this.role = role;        
+    }
+    
+    public User() {      
+    }
+    
+    public User(String login, String password) {
+        this.login = login;
+        this.passwordHash = password;
     }
     
     public static String getCreateStatement(){
@@ -92,7 +101,34 @@ public class User {
         return user;
     }
     
-    public static void insertUser(String login, String name, String role, String password) throws Exception{
+    public static User getUserByLogin(String login) throws Exception {
+        User user = null;
+        Connection conexao = AppListener.getConnection();
+        String sql = "SELECT rowid, * from users WHERE login=?";
+        
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        stmt.setString(1, login);
+
+        ResultSet rs = stmt.executeQuery();
+        
+        if(rs.next())
+        {
+            long rowId = rs.getLong("rowid");
+            String name = rs.getString("name");
+            String role = rs.getString("role");
+            String passwordHash = rs.getString("password_hash");
+            
+            user = new User(rowId, login, name, role, passwordHash);
+        }
+        
+        rs.close();
+        stmt.close();
+        conexao.close();
+        
+        return user;
+    }
+    
+    public static boolean insertUser(String login, String name, String role, String password) throws Exception{
         
         Connection conexao = AppListener.getConnection();
         String sql = "INSERT INTO users(login, name, role, password_hash)"
@@ -105,13 +141,13 @@ public class User {
         stmt.setString(3, role);
         stmt.setString(4, AppListener.getMd5Hash(password));
         
-        stmt.execute();
+        int rowsAffected = stmt.executeUpdate();
         conexao.close();
         stmt.close();
-        
+        return rowsAffected > 0;
     }
     
-    public static void updateUser(String login, String name, String role, String password) throws Exception{
+    public static boolean updateUser(String login, String name, String role, String password) throws Exception{
         
         Connection conexao = AppListener.getConnection();
         String sql = "UPDATE users SET name=?, role=?, password_hash=? WHERE login=?";
@@ -123,13 +159,13 @@ public class User {
         stmt.setString(3, AppListener.getMd5Hash(password));
         stmt.setString(4, login);
         
-        stmt.execute();
+        int rowsAffected = stmt.executeUpdate();
         conexao.close();
         stmt.close();
-        
+        return rowsAffected > 0;
     }
     
-    public static void deleteUser(long rowId) throws Exception{
+    public static boolean deleteUser(long rowId) throws Exception{
         
         Connection conexao = AppListener.getConnection();
         String sql = "DELETE FROM users WHERE rowid=?";
@@ -137,9 +173,10 @@ public class User {
         PreparedStatement stmt = conexao.prepareStatement(sql);
         
         stmt.setLong(1, rowId);
-        stmt.execute();
+        int rowsAffected = stmt.executeUpdate();
         conexao.close();
         stmt.close();
+        return rowsAffected > 0;
     }
 
     public long getId() {

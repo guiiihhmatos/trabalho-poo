@@ -1,10 +1,10 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@ page pageEncoding="UTF-8"%>
-<%@ page import="web.HttpHelper" %>
+<%@ page import="web.commons.RequestUtils" %>
 <%@ page import="model.User" %>
-<%@ page import="web.UsuarioNaoAutenticadoException"%>
-<%@ page import="org.json.JSONObject"%>
+<%@ page import="exceptions.UserNaoAutentException"%>
+<%@ page import="web.commons.JsonUtils"%>
 <%
 	if(application.getAttribute("listaUsers")==null){
 		application.setAttribute("listaUsers", new ArrayList());
@@ -15,15 +15,12 @@
             try {
                 String login = request.getParameter("session-login");
                 String password = request.getParameter("session-pass");
-                String resp = HttpHelper.makePutRequest(login, password);                
-                JSONObject jObj = new JSONObject(resp);
-                user = new User(jObj.getString("login"),
-                    jObj.getString("name"),
-                    jObj.getString("role")                             
-                );                
+                String resp = RequestUtils.makePutRequest(login, password);                
+                
+                user = JsonUtils.fromJson(resp, User.class);                
                 request.getSession(true).setAttribute("user", user);
-                listaUsersArray.add((User)session.getAttribute("user"));
-            } catch (UsuarioNaoAutenticadoException una) {                
+                listaUsersArray.add(user);
+            } catch (UserNaoAutentException una) {                
                 // Armazena a mensagem de erro em um atributo de escopo de solicitação
                 request.setAttribute("SC_FORBIDDEN", una.getMessage());
             } catch (Exception e) {

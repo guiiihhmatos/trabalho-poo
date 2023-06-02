@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.sql.*;
-import web.AppListener;
+import web.app.AppListener;
 
 public class Livro {
     
@@ -43,7 +43,7 @@ public class Livro {
         ArrayList<Livro> list = new ArrayList<>();
         Connection conexao = AppListener.getConnection();
         Statement stmt = conexao.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT rowid, * from livro WHERE dispobilidade = true ");
+        ResultSet rs = stmt.executeQuery("SELECT rowid, * from livro WHERE disponibilidade = true ");
         
         while(rs.next())
         {
@@ -130,7 +130,7 @@ public class Livro {
         return livro;
     }
     
-    public static void insertLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
+    public static boolean insertLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
         
         Connection conexao = AppListener.getConnection();
         String sql = "INSERT INTO livro(titulo, autor, editora, ano_publicacao, isbn, descricao, disponibilidade)"
@@ -146,13 +146,15 @@ public class Livro {
         stmt.setString(6, descricao);
         stmt.setBoolean(7, disponibilidade);
         
-        stmt.execute();
+        int rowsAffected = stmt.executeUpdate();
+            
         conexao.close();
         stmt.close();
         
+        return rowsAffected > 0;
     }
     
-    public static void updateLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
+    public static boolean updateLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
         
         Connection conexao = AppListener.getConnection();
         String sql = "UPDATE livro SET titulo = ?, autor = ?, editora = ?, ano_publicacao = ?, "
@@ -172,12 +174,13 @@ public class Livro {
         
         // Executa o comando UPDATE
         int rowsAffected = stmt.executeUpdate();
+        
         conexao.close();
         stmt.close();
-        
+        return rowsAffected > 0;
     }
     
-    public static void deleteLivro(long rowId) throws Exception{
+    public static boolean deleteLivro(long rowId) throws Exception{
         
         Connection conexao = AppListener.getConnection();
         String sql = "DELETE FROM livro WHERE rowid=?";
@@ -185,9 +188,11 @@ public class Livro {
         PreparedStatement stmt = conexao.prepareStatement(sql);
         
         stmt.setLong(1, rowId);
-        stmt.execute();
+        int rowsAffected = stmt.executeUpdate();
+            
         conexao.close();
         stmt.close();
+        return rowsAffected > 0;
     }
 
     public long getId() {
