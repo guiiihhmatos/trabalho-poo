@@ -191,7 +191,7 @@ function preencherFormulario(dadosItem, campos) {
    }
 }
 
-        // Função para criar os campos dinamicamente
+ // Função para criar os campos dinamicamente
  function criarCamposDinamicos() {
     var formFields = document.getElementById('form-fields');
     formFields.innerHTML = '';
