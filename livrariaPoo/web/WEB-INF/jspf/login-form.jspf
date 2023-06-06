@@ -1,18 +1,44 @@
 <%@ page pageEncoding="UTF-8"%>
-<div class="card" style="width: 18rem;">
-  <div class="card-body">
-    <h5 class="card-title">Formulário de Identificação</h5>
-    <h6 class="card-subtitle mb-2 text-body-secondary">Use o form para se identificar.</h6>
-    <form method="post">
-    	<div>
-    		<label  class="form-label">Login</label>
-    		<input type="text" class="form-control" id="formLogin" name="session-login" required
-                       <hr/>
-                <label  class="form-label">Password</label>
-    		<input type="password" class="form-control" id="formPass" name="session-pass" required>
-    		<hr/>
-    		<input type="submit" name="session-submit" class="btn btn-primary" />
-    	</div>
-    </form>
-  </div>
+<%@include file="/WEB-INF/css_include.jsp" %>
+
+<div class="login">
+
+    <div class="container login-container shadow p-0 ">
+
+        <div class="info__div p-0">
+
+            <img src="images/public-library.png" alt="Livraria" class="image-library">
+
+        </div>
+
+        <div class="inputs__div p-0">
+
+            <h1 class="text-center titulo">Login</h1>
+
+            <form class="form__input w-100 mt-3" style='background-color: white;' method="post">
+
+                <div class="mt-3 form-group">
+
+                    <label class="form-label">Usuário</label>
+                    <input type="text" class="form-control" id="formLogin" name="session-login" required/>
+
+                </div>
+
+                <div class="mt-3 form-group">
+
+                    <label class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="formPass" name="session-pass" required>
+
+                </div>
+
+                <button class="mt-5 default__button" name="session-submit" type="submit">
+                    Login
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
 </div>
+
