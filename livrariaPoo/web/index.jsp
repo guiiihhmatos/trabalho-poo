@@ -12,6 +12,9 @@
 		<h2>Página inicial</h2>
 	</div>
 	<%}%>
+        
+        
+
 	<%@include file="WEB-INF/jspf/html-body-libs.jspf"%>
 </body>
 </html>

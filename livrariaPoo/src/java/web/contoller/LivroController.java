@@ -34,6 +34,7 @@ public class LivroController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response createLivro(Livro pLivro) throws Exception {
         boolean criado = Livro.insertLivro(pLivro.getTitulo(), pLivro.getAutor(),
                     pLivro.getEditora(), pLivro.getAno_publicacao(), 
@@ -81,8 +82,8 @@ public class LivroController {
 
     @DELETE
     @Path("/{rowId}")
-    public Response deleteLivro(@PathParam("rowId") Long rowId) throws Exception {
-        boolean excluido = Livro.deleteLivro(rowId);        
+    public Response deleteLivro(@PathParam("isbn") String isbn) throws Exception {
+        boolean excluido = Livro.deleteLivro(isbn);        
         if (excluido) {
             return Response.ok().entity("Livro excluído com sucesso").build();
         } else {

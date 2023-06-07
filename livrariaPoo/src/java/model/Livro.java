@@ -5,6 +5,9 @@ import java.sql.*;
 import web.app.AppListener;
 
 public class Livro {
+
+    public Livro() {
+    }
     
     private long rowId;
     private String titulo;
@@ -180,14 +183,14 @@ public class Livro {
         return rowsAffected > 0;
     }
     
-    public static boolean deleteLivro(long rowId) throws Exception{
+    public static boolean deleteLivro(String isbn) throws Exception{
         
         Connection conexao = AppListener.getConnection();
-        String sql = "DELETE FROM livro WHERE rowid=?";
+        String sql = "DELETE FROM livro WHERE isbn=?";
         
         PreparedStatement stmt = conexao.prepareStatement(sql);
         
-        stmt.setLong(1, rowId);
+        stmt.setString(1, isbn);
         int rowsAffected = stmt.executeUpdate();
             
         conexao.close();

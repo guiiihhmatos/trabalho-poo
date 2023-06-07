@@ -1,5 +1,7 @@
 function exibirDados(lista, colunas, titulos) {
   var table = document.createElement("table");
+   //add table id
+  table.setAttribute("id", "table");
   table.classList.add("table");
 
   var thead = document.createElement("thead");
@@ -23,26 +25,29 @@ function exibirDados(lista, colunas, titulos) {
     for (var j = 0; j < colunas.length; j++) {
       var coluna = colunas[j];
       var td = document.createElement("td");
-      td.innerText = item[coluna];
-           
+      
+      if(item[coluna] === "acao")
+      {
+        td.innerText = '<button class="btn btn-primary" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>';
+      }else
+      {
+        td.innerText = item[coluna];   
+      }
+      
+      
       trItem.appendChild(td);
     }
 
-    // Adicionar evento de clique para exibir a popup de edição
+
     trItem.addEventListener("click", function () {
       
-      var linhas = Array.from(tbody.getElementsByTagName("tr"));
-      linhas.forEach(function (linha) {
+    var linhas = Array.from(tbody.getElementsByTagName("tr"));
+    linhas.forEach(function (linha) {
         linha.classList.remove('destaque2');
-      });
-      
-      var dadosItem = getDadosItem(this, colunas);
-      // Preenche o formulário com os dados do item
-      preencherFormulario(dadosItem, colunas); // Função a ser implementada para preencher o formulário
-      this.classList.add("destaque2");
+      });            
     });
 
-     // Adicionar classe de destaque ao passar o mouse sobre a linha
+    // Adicionar classe de destaque ao passar o mouse sobre a linha
     trItem.addEventListener("mouseover", function () {
       this.classList.add("destaque");
     });
@@ -161,58 +166,6 @@ function filtrarTabela(table, filtro) {
     row.style.display = correspondencia ? "" : "none";
   }
 }
-
-// Função para obter os dados do item selecionado
-function getDadosItem(linha, colunas) {
-  var dadosItem = {};
-
-  // Obtém as células da linha
-  var cells = linha.getElementsByTagName("td");
-
-  // Preenche os dados do item com base nas células da linha e colunas fornecidas
-  for (var i = 0; i < colunas.length; i++) {
-    var coluna = colunas[i];
-    var valor = cells[i].innerText;
-
-    // Adiciona o valor da célula ao campo correspondente do objeto dadosItem
-    dadosItem[coluna] = valor;
-  }  
-  // Retorna os dados do item
-  return dadosItem;
-}
-
-
-// Função para preencher o formulário com os dados do item
-function preencherFormulario(dadosItem, campos) {
-    // Preenche os campos do formulário com os valores das colunas
-   for (var i = 0; i < campos.length; i++) {
-     var campo = document.getElementById(campos[i]);
-     campo.value = dadosItem[campos[i]];
-   }
-}
-
- // Função para criar os campos dinamicamente
- function criarCamposDinamicos() {
-    var formFields = document.getElementById('form-fields');
-    formFields.innerHTML = '';
-
-    for (var i = 0; i < campos.length; i++) {
-      var campoDiv = document.createElement('div');
-      campoDiv.className = 'mb-3';
-
-      var label = document.createElement('label');
-      label.innerText = titulos[i];
-      campoDiv.appendChild(label);
-
-      var input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'form-control';
-      input.id = campos[i];
-      campoDiv.appendChild(input);
-
-      formFields.appendChild(campoDiv);
-    }
-  }     
          
 // Estilos CSS para a linha destacada
 var destaqueStyles = document.createElement("style");
