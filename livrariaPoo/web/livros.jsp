@@ -13,8 +13,8 @@
   <script src="grid.js"></script>
   <script>
     var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
-    var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição", "Ação"]; // Especifica os tí­tulos personalizados                    
-    var tipos = ["text", "text", "text", "number", "checkbox", "text", "text", "button"]; // Especifica os tí­tulos personalizados                    
+    var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados                    
+    var tipos = ["text", "text", "text", "number", "checkbox", "text", "text"]; // Especifica os tí­tulos personalizados                    
     window.onload = function() {
         criarCamposForm();
         listarLivros();
@@ -224,7 +224,7 @@
 </head>
 <body>
 <%@include file="WEB-INF/jspf/navbar.jspf"%>
- <%if( user != null && user.getRole().equals("ADMIN") ){%>
+ <%if(user!=null){ %>
   <div class="container">
     <div class="row">
       <div class="col-md-12">
@@ -234,24 +234,22 @@
       </div>
     </div>    
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-8">
         <div class="table-container">
           <!-- Espaço para a tabela -->	
             <div id="dados-container"></div>                                
         </div>
-      </div>    
-    </div>
-      
-      <div class="row">
-          <div class="col-md-4">
-            <form id="myForm" >
-              <div id="error-container" style="display: none; color: red;"></div>
-              <div id="form-fields"></div>
-               <input type="hidden" name="metodo" id="metodo" value="post">
-              <button type="button" onclick="submitForm()" class="btn btn-primary" id="btnSalvar">Salvar</button>
-            </form>
-          </div>
       </div>
+      <div class="col-md-4">
+        <form id="myForm" >
+          <div id="error-container" style="display: none; color: red;"></div>
+          <!-- campos do formulário dinâmicos -->
+          <div id="form-fields"></div>
+           <input type="hidden" name="metodo" id="metodo" value="post">
+          <button type="button" onclick="submitForm()" class="btn btn-primary" id="btnSalvar">Salvar</button>
+        </form>
+      </div>
+    </div>
   </div>
 
   <%}%>
