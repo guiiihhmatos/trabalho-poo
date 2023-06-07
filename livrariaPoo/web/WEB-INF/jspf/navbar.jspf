@@ -1,5 +1,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Map"%>
 <%@ page pageEncoding="UTF-8"%>
 <%@ page import="web.commons.RequestUtils" %>
 <%@ page import="model.User" %>
@@ -7,9 +9,11 @@
 <%@ page import="web.commons.JsonUtils"%>
 <%
 	if(application.getAttribute("listaUsers")==null){
-		application.setAttribute("listaUsers", new ArrayList());
+		application.setAttribute("listaUsers", new ArrayList<User>());
+                application.setAttribute("sessionMap", new HashMap<>());                
 	}
-	List listaUsersArray = (ArrayList) application.getAttribute("listaUsers");	
+	List<User> listaUsersArray = (List<User>) application.getAttribute("listaUsers");	
+        Map<String, HttpSession> sessionMap = (HashMap<String, HttpSession>) application.getAttribute("sessionMap");
 	if(request.getParameter("session-submit")!=null){
             User user = null;
             try {
@@ -17,8 +21,10 @@
                 String password = request.getParameter("session-pass");                
                 String resp = RequestUtils.makePutRequest(login, password);                
                 user = JsonUtils.fromJson(resp, User.class);                
-                request.getSession(true).setAttribute("user", user);
+                request.getSession(true).setAttribute("user", user);                
                 listaUsersArray.add(user);
+                user.setSessionId(request.getSession().getId());
+                sessionMap.put(request.getSession().getId(),request.getSession());
             } catch (UserNaoAutentException una) {                
                 // Armazena a mensagem de erro em um atributo de escopo de solicitação
                 request.setAttribute("err_msg", una.getMessage());
@@ -27,7 +33,8 @@
             }			
 	}else if(request.getParameter("session-out")!= null){
 		listaUsersArray.remove(session.getAttribute("user"));
-		session.removeAttribute("user");
+		request.getSession().removeAttribute("user");
+                //sessionMap.remove(request.getSession().getId());
 		response.sendRedirect(request.getRequestURI());
 	}
 	
@@ -56,7 +63,10 @@
                     </li>
                     <%if(user!=null && user.getRole().equals("ADMIN")){ %>
                         <li class="nav-item">
-                            <a class="nav-link" href="${pageContext.request.contextPath}/users.jsp">Users</a>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/usuarios.jsp">Users</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="${pageContext.request.contextPath}/sessions.jsp">Sessões</a>
                         </li>
                     <%}%>
                 </ul>
@@ -107,7 +117,7 @@
 <!-- Exibição da mensagem de erro -->
 <div class="error-message">
     <%-- Recupera a mensagem de erro do atributo de escopo de solicitação --%>
-    ${requestScope.SC_FORBIDDEN}
+    ${requestScope.err_msg}
 </div>
 
 <% } %>
