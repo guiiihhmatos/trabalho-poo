@@ -1,4 +1,3 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.List"%>
 <%@ page import="model.User" %>
@@ -6,14 +5,14 @@
 <html>
 <head>
 <%@include file="WEB-INF/jspf/html-head-libs.jspf"%>
-<title>Biblioteca - UsuÃ¡rios</title>
+<title>Biblioteca - Usuários</title>
 </head>
 <body>
 	<%@include file="WEB-INF/jspf/navbar.jspf"%>
 	<%if(user!=null && user.getRole().equals("ADMIN")){ %>
 
         <%  if(request.getParameter("session-item-end")!= null){
-                // ObtÃ©m o login do usuÃ¡rio a ser removido
+                // Obtém o login do usuário a ser removido
                 String sessionToRemove = request.getParameter("sessionId");
                 listaUsersArray = (List<User>) application.getAttribute("listaUsers");
                 User userToRemove = null;
@@ -23,37 +22,37 @@
                         break;
                     }
                 }
-                // Remove o usuÃ¡rio da lista, se encontrado
+                // Remove o usuário da lista, se encontrado
                 if (userToRemove != null) {
                     listaUsersArray.remove(userToRemove);
                 }
                 
                 HttpSession sessionToInvalidate = sessionMap.get(sessionToRemove);
                 if (sessionToInvalidate != null ) {
-                    // Invalida a sessÃ£o do usuÃ¡rio
+                    // Invalida a sessão do usuário
                     sessionToInvalidate.invalidate();
                     sessionMap.remove(sessionToRemove);
                 }
             }       
         %>
             <div class="container">
-                <h1>UsuÃ¡rios Conectados</h1>
+                <h1>Usuários Conectados</h1>
                 <table class="table table-bordered table-striped" style="max-height: 300px; overflow-y: auto;">
                         <thead class="thead-dark">
                                 <tr>
-                                        <th>UsuÃ¡rio</th>
-                                        <th>AÃ§Ã£o</th>
+                                        <th>Usuário</th>
+                                        <th>Ação</th>
                                 </tr>
                         </thead>
                         <tbody>
-                            <%-- Itera sobre a lista de usuÃ¡rios --%>
+                            <%-- Itera sobre a lista de usuários --%>
                             <c:forEach var="user" items="${applicationScope.listaUsers}">
                                 <tr>
                                     <td>${user.name}</td>
                                     <td>
                                         <form action="${pageContext.request.contextPath}/sessions.jsp">
                                                 <input type="hidden" name="sessionId" value="${user.sessionId}">
-                                                <button type="submit" class="btn btn-danger" name="session-item-end">Encerrar SessÃ£o</button>
+                                                <button type="submit" class="btn btn-danger" name="session-item-end">Encerrar Sessão</button>
                                         </form>
                                     </td>
                                 </tr>
