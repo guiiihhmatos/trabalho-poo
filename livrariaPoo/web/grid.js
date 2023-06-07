@@ -22,19 +22,16 @@ function exibirDados(lista, colunas, titulos) {
     var item = lista[i];
     var trItem = document.createElement("tr");
 
-    for (var j = 0; j < colunas.length; j++) {
+    for (var j = 0; j <= colunas.length; j++) {
       var coluna = colunas[j];
       var td = document.createElement("td");
       
-      if(item[coluna] === "acao")
-      {
-        td.innerText = '<button class="btn btn-primary" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>';
-      }else
-      {
-        td.innerText = item[coluna];   
-      }
-      
-      
+     td.innerText = item[coluna];
+     
+     if(colunas.length == j)
+     {
+         td.innerText = '<button class="btn btn-primary" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>';
+     }
       trItem.appendChild(td);
     }
 

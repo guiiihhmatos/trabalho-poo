@@ -12,7 +12,7 @@
   </style>
   <script src="grid.js"></script>
   <script>
-    var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao", "acao" ]; // Especifica as colunas desejadas
+    var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
     var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição", "Ação"]; // Especifica os tí­tulos personalizados                    
     var tipos = ["text", "text", "text", "number", "checkbox", "text", "text", "button"]; // Especifica os tí­tulos personalizados                    
     window.onload = function() {
