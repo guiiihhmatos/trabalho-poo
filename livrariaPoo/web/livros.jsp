@@ -6,17 +6,15 @@
   <title>Biblioteca - Livros</title>
   <style>
     .table-container {
-      height: 400px; /* Defina a altura desejada */
+      min-height: 400px; /* Defina a altura desejada */
       overflow-y: auto; /* Habilita a rolagem vertical */
     }
   </style>
   <script src="grid.js"></script>
   <script>
     var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
-    var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados                    
-    var tipos = ["text", "text", "text", "number", "checkbox", "text", "text"]; // Especifica os tí­tulos personalizados                    
-    window.onload = function() {
-        criarCamposForm();
+    var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
+    window.onload = function() {        
         listarLivros();
         //desabilitar campos de edição
         for (var i = 0; i < campos.length; i++) {
@@ -28,29 +26,28 @@
     
     function listarLivros() {
       var xhr = new XMLHttpRequest();
-        xhr.open("GET", "${pageContext.request.contextPath}/api/livros", true);
-        xhr.onreadystatechange = function () {
-            var errorContainer = document.getElementById("error-container");
-            errorContainer.style.display = "none";
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var lista = JSON.parse(xhr.responseText);     
-                var table = exibirDados(lista, campos, titulos);
-                //registro do evento de click na tabela
-                table.addEventListener("click", clickGrid);
-                var container = document.getElementById("dados-container");
-                // Limpa o conteúdo existente definindo innerHTML como uma string vazia
-                container.innerHTML = '';
-                container.appendChild(table);                                        
-            } else {                   
-                errorContainer.innerText = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente mais tarde.";
-                errorContainer.style.display = "block";
-            }
-        };
-        xhr.send();
+      xhr.open("GET", "${pageContext.request.contextPath}/api/livros", true);
+      xhr.onreadystatechange = function () {
+          var errorContainer = document.getElementById("error-container");
+          errorContainer.style.display = "none";
+          if (xhr.readyState === 4 && xhr.status === 200) {
+              var lista = JSON.parse(xhr.responseText);     
+              var table = exibirDados(lista, campos, titulos);
+              //registro do evento de click na tabela
+              table.addEventListener("click", clickGrid);
+              var container = document.getElementById("dados-container");
+              // Limpa o conteúdo existente definindo innerHTML como uma string vazia
+              container.innerHTML = '';
+              container.appendChild(table);                                        
+          } else {                   
+              errorContainer.innerText = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente mais tarde.";
+              errorContainer.style.display = "block";
+          }
+      };
+      xhr.send();
     }
     function submitForm() {
-        var data = {};
-        
+        var data = {};        
         //validação dos campos do formulário
         var errorContainer = document.getElementById("error-container");
         errorContainer.style.display = "none";
@@ -109,6 +106,17 @@
         var table = document.getElementById("table");
         var tr = table.getElementsByTagName("tr");
         event.target.parentElement.classList.add("destaque2");
+        preencherCampos(event);
+        //habilita campos de edição
+        habilitaCamposEdicao();
+        // Obtém uma referência ao elemento do campo oculto
+        document.getElementById('metodo').value = 'put';
+        // desabilita campo isbn (chave primária)
+        document.getElementById("isbn").disabled = true;
+        var errorContainer = document.getElementById("error-container");
+        errorContainer.style.display = "none";        
+    }
+    function preencherCampos(event){
         //preencher campos do formulário com dados da linha selecionada
         var td = event.target.parentElement.getElementsByTagName("td");
         for (var i = 0; i < campos.length; i++) {
@@ -119,19 +127,14 @@
               document.getElementById(campo).value = td[i].innerText;
             }
         }
-        //habilita campos de edição
+    }
+    function habilitaCamposEdicao(){
         for (var i = 0; i < campos.length; i++) {
             var campo = campos[i];
             document.getElementById(campo).removeAttribute("disabled");
         }
         document.getElementById("btnSalvar").disabled = false;
         document.getElementById("btnDeletar").disabled = false;
-        // Obtém uma referência ao elemento do campo oculto
-        document.getElementById('metodo').value = 'put';
-        // desabilita campo isbn (chave primária)
-        document.getElementById("isbn").disabled = true;
-        var errorContainer = document.getElementById("error-container");
-        errorContainer.style.display = "none";        
     }
 
     function deletarSelectedItemGrid(){
@@ -141,6 +144,7 @@
         }
         var errorContainer = document.getElementById("error-container");
         errorContainer.style.display = "none";
+        
         fetch( "${pageContext.request.contextPath}/api/livros/" + isbn, {
             method: 'delete',
             headers: {
@@ -171,81 +175,88 @@
 
     function novoLivroForm() {
         for (var i = 0; i < campos.length; i++) {
-            var campo = campos[i];
-            document.getElementById(campo).value = "";
-            document.getElementById(campo).removeAttribute("disabled");
+            document.getElementById(campos[i]).value = "";
+            document.getElementById(campos[i]).removeAttribute("disabled");
         }
+
         document.getElementById("btnSalvar").disabled = false;
-        var errorContainer = document.getElementById("error-container");
-        errorContainer.innerHTML = "";
-        //desmarcar item selecionado na tabela
-          //desmarcar item selecionado na tabela
+        document.getElementById("error-container").innerHTML = "";
         var table = document.getElementById("table");
         var tr = table.getElementsByTagName("tr");
         for (var i = 0; i < tr.length; i++) {
             tr[i].classList.remove("destaque2");
         }
+
         document.getElementById("btnDeletar").disabled = true;
-        //alterar method do form para POST        
         document.getElementById('metodo').value = 'post';
     }
-
-      // Função para criar os campos form
-    function criarCamposForm() {
-      var formFields = document.getElementById('form-fields');
-      formFields.innerHTML = '';
-
-      for (var i = 0; i < campos.length; i++) {
-        var campoDiv = document.createElement('div');
-        campoDiv.className = 'mb-3';
-
-        var label = document.createElement('label');
-        label.innerText = titulos[i];
-        campoDiv.appendChild(label);
-
-        var input = document.createElement('input');
-        input.type = tipos[i]; 
-                        
-        if(tipos[i] === 'checkbox'){
-          input.className = 'form-check-input ';
-          // Adiciona o espaço entre o checkbox e o label usando margens
-          input.style.marginLeft = '10px';
-        }else{
-          input.className = 'form-control';
-        }
-        input.id = campos[i];
-        campoDiv.appendChild(input);
-
-        formFields.appendChild(campoDiv);
-      }
-    } 
-
     </script>
 </head>
 <body>
 <%@include file="WEB-INF/jspf/navbar.jspf"%>
  <%if(user!=null){ %>
   <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        <!-- Espaço para os botões -->
-        <button class="btn btn-primary" onclick="novoLivroForm()">Novo</button>
-        <button class="btn btn-primary" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>
-      </div>
-    </div>    
+     
     <div class="row">
       <div class="col-md-8">
-        <div class="table-container">
+        <div class="table-container d-flex flex-column align-items-center">
           <!-- Espaço para a tabela -->	
-            <div id="dados-container"></div>                                
+          
+          <h3 class="my-5">Lista de livros</h3>
+            <div id="dados-container"></div>
+            
+            <div class="d-flex justify-content-around align-items-center w-25">
+                <button class="btn btn-primary" onclick="novoLivroForm()">Novo</button>
+                <button class="btn btn-danger" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>
+            </div>
+            
         </div>
-      </div>
+      </div>      
       <div class="col-md-4">
-        <form id="myForm" >
+          
+          <h3 class="my-5 text-center">Cadastrar novo livro</h3>
+          
+        <form id="myForm" class="mb-5">
           <div id="error-container" style="display: none; color: red;"></div>
           <!-- campos do formulário dinâmicos -->
-          <div id="form-fields"></div>
-           <input type="hidden" name="metodo" id="metodo" value="post">
+          <div id="form-fields">
+
+            <div class="mb-3">
+              <label for="isbn">Isbn</label>
+              <input type="text" class="form-control w-100" id="isbn" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="titulo">Tí­tulo</label>
+              <input type="text" class="form-control" id="titulo" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="autor">Autor</label>
+              <input type="text" class="form-control" id="autor" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="editora">Editora</label>
+              <input type="text" class="form-control" id="editora" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="ano_publicacao">Ano</label>
+              <input type="number" class="form-control" id="ano_publicacao" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="disponibilidade">Disponibilidade</label>
+              <input type="checkbox" class="form-check-input" id="disponibilidade" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="descricao">Descrição</label>
+              <input type="text" class="form-control" id="descricao" disabled>
+          </div>
+            <input type="hidden" name="metodo" id="metodo" value="post">
+          </div>
           <button type="button" onclick="submitForm()" class="btn btn-primary" id="btnSalvar">Salvar</button>
         </form>
       </div>

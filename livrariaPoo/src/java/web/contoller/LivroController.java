@@ -81,7 +81,7 @@ public class LivroController {
     }     
 
     @DELETE
-    @Path("/{rowId}")
+    @Path("/{isbn}")
     public Response deleteLivro(@PathParam("isbn") String isbn) throws Exception {
         boolean excluido = Livro.deleteLivro(isbn);        
         if (excluido) {
@@ -93,4 +93,3 @@ public class LivroController {
         }
     }
 }
-

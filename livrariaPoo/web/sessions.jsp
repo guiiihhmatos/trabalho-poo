@@ -35,16 +35,16 @@
                 }
             }       
         %>
-            <div class="container">
-                <h1>Usuários Conectados</h1>
+            <div class="container text-center">
+                <h1 class="my-5">Usuários Conectados</h1>
                 <table class="table table-bordered table-striped" style="max-height: 300px; overflow-y: auto;">
-                        <thead class="thead-dark">
+                        <thead class="thead-dark text-center">
                                 <tr>
                                         <th>Usuário</th>
                                         <th>Ação</th>
                                 </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="text-center">
                             <%-- Itera sobre a lista de usuários --%>
                             <c:forEach var="user" items="${applicationScope.listaUsers}">
                                 <tr>
