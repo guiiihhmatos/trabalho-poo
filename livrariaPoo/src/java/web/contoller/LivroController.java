@@ -48,7 +48,7 @@ public class LivroController {
             
             // Retornar uma resposta com código 201 (Created) e o URL do novo livro
             return Response.created(uriBuilder.build())
-                           .entity("Livro criado com sucesso: " + livroUrl)
+                           .entity(livroUrl)
                            .build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

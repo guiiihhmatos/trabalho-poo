@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import web.app.AppListener;
@@ -15,11 +16,11 @@ import web.app.AppListener;
 public class Emprestimo {
     
     public Emprestimo(){}
-    
+
     private long rowId;
     private Long idUsuario;
     private Long idLivro;
-    private Integer data_emprestimo;
+    private Integer dataEmprestimo;
     
     
     public static String getCreateStatement(){
@@ -36,7 +37,7 @@ public class Emprestimo {
         this.rowId = rowId;
         this.idUsuario = idUsuario;
         this.idLivro = idLivro;
-        this.data_emprestimo = data_emprestimo;
+        this.dataEmprestimo = data_emprestimo;
     }
      
      public static ArrayList<Emprestimo> getAllEmprestimo() throws Exception{
@@ -64,17 +65,17 @@ public class Emprestimo {
     }
      
      
-    public static boolean insertEmprestimo(Long idUsuario, Long idLivro, Integer data_emprestimo) throws Exception{
+    public static boolean insertEmprestimo(Long idUsuario, Long idLivro, LocalDate dataEmprestimo) throws Exception{
         
         Connection conexao = AppListener.getConnection();
-        String sql = "INSERT INTO emprestimo(idUsuario, idLivro, data_emprestimo)"
-                + "VALUES (?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO emprestimo(idUsuario, idLivro, data_emprestimo) "
+                + "VALUES (?,?,?)";
         
         PreparedStatement stmt = conexao.prepareStatement(sql);
         
         stmt.setLong(1, idUsuario);
         stmt.setLong(2, idLivro);
-        stmt.setInt(3, data_emprestimo);
+        stmt.setDate(3, java.sql.Date.valueOf(dataEmprestimo));
         int rowsAffected = stmt.executeUpdate();
             
         conexao.close();
@@ -82,6 +83,36 @@ public class Emprestimo {
         
         return rowsAffected > 0;
     }
-    
+    public long getRowId() {
+        return rowId;
+    }
+
+    public void setRowId(long rowId) {
+        this.rowId = rowId;
+    }
+
+    public Long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public Long getIdLivro() {
+        return idLivro;
+    }
+
+    public void setIdLivro(Long idLivro) {
+        this.idLivro = idLivro;
+    }
+
+    public Integer getDataEmprestimo() {
+        return dataEmprestimo;
+    }
+
+    public void setDataEmprestimo(Integer data_emprestimo) {
+        this.dataEmprestimo = data_emprestimo;
+    }    
     
 }

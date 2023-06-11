@@ -157,6 +157,25 @@ public class Livro {
         return rowsAffected > 0;
     }
     
+    
+    
+    public static boolean updateDisponibilidade(Boolean disp, String isbn) throws Exception{
+        Connection conexao = AppListener.getConnection();
+        String sql = "UPDATE livro SET disponibilidade = ? WHERE isbn = ?";
+        
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        // Define o valor do primeiro parâmetro como uma String                
+        stmt.setBoolean(1, disp);
+        stmt.setString(2, isbn);
+
+        // Executa o comando UPDATE
+        int rowsAffected = stmt.executeUpdate();
+        
+        conexao.close();
+        stmt.close();
+        return rowsAffected > 0;
+    }
+    
     public static boolean updateLivro(String titulo, String autor, String editora, int ano_publicacao, String isbn, String descricao, Boolean disponibilidade) throws Exception{
         
         Connection conexao = AppListener.getConnection();

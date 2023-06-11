@@ -22,12 +22,12 @@
         <div class="table-container d-flex flex-column align-items-center">
           <!-- Espaço para a tabela -->	
           
-          <h3 class="my-5">Lista de livros</h3>
+          <h3 class="my-5">Lista de livros <%if(user.getRole().equals("USER")){ %> Disponíveis <%}%> </h3>
             <div id="dados-container"></div>
             
             <div class="d-flex justify-content-around align-items-center w-25">
                 <%if(user.getRole().equals("USER")){ %>
-                <button class="btn btn-primary" id="btnEmprestimo" onclick="alugarLivro()">Alugar</button>
+                <button class="btn btn-primary" id="btnEmprestimo" disabled onclick="alugarLivro()">Alugar</button>
                 <%}%>
                 
                 <%if(user.getRole().equals("ADMIN")){ %>
@@ -92,8 +92,9 @@
 
     <script>
         
-  var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
+    var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
     var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disp.", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
+    var livroSelParaLocacao = "";
     window.onload = function() {        
         listarLivros();
         
@@ -125,6 +126,8 @@
              <%if(user.getRole().equals("ADMIN")){ %>  
                 //registro do evento de click na tabela para edicao via form
               table.addEventListener("click", clickGrid);
+             <%}else{%>
+              table.addEventListener("click", clickGridLocacao);
              <%}%>
               var container = document.getElementById("dados-container");
               // Limpa o conteúdo existente definindo innerHTML como uma string vazia
@@ -137,9 +140,40 @@
       };
       xhr.send();
     }         
-        
+    function alugarLivro(){      
+        var data = {};     
+        data["idUsuario"] =  "<%=user.getId()%>";        
+        data["isbn"] = livroSelParaLocacao; 
+        var jsonData = JSON.stringify(data);
+        fetch( "${pageContext.request.contextPath}/api/emprestimo", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: jsonData
+        }).then(response => {              
+            if(response.ok){
+                listarLivros();                   
+                //desabilitar campos de edição
+                for (var i = 0; i < campos.length; i++) {
+                    var campo = campos[i];
+                    document.getElementById(campo).value = "";
+                    document.getElementById(campo).disabled = true;
+                }
+                document.getElementById("btnSalvar").disabled = true;
+            } 
+            return response.json();                              
+          }).then(data => {
+                    errorContainer.innerText = "Erro: " + data.message;
+                    errorContainer.style.display = "block";                   
+            console.log('Resposta:', data);             
+        }).catch(error => {              
+            errorContainer.innerText = "Erro: " + error;
+            errorContainer.style.display = "block";
+        });
+    }
         function submitForm() {
-        var data = {};        
+        var data = {};   
         //validação dos campos do formulário
         var errorContainer = document.getElementById("error-container");
         errorContainer.style.display = "none";
@@ -154,7 +188,7 @@
               valor = document.getElementById(campo).checked ? "true" : "false";
             }
             //preenche objeto data com os campos do formulário
-            data[campo] = valor;
+            data[campo] = valor; 
         }
         if (camposInvalidos.length > 0) {
             errorContainer.innerText = "Os seguintes campos são obrigatórios: " + camposInvalidos.join(", ");
@@ -208,6 +242,17 @@
         document.getElementById("isbn").disabled = true;
         var errorContainer = document.getElementById("error-container");
         errorContainer.style.display = "none";        
+    }
+    
+        //funcao para capturar evento de click na tabela
+    function clickGridLocacao(event) {
+        var table = document.getElementById("table");
+        var tr = table.getElementsByTagName("tr");
+        event.target.parentElement.classList.add("destaque2");
+        
+        var td = event.target.parentElement.getElementsByTagName("td");        
+        livroSelParaLocacao = td[5].innerText;
+        document.getElementById("btnEmprestimo").disabled = false;
     }
     function preencherCampos(event){
         //preencher campos do formulário com dados da linha selecionada
