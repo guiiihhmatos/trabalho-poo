@@ -8,8 +8,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.Date;
+import model.Emprestimo;
 import model.Livro;
 import model.User;
+import static web.AppListener.initializelog;
 
 @WebListener
 public class AppListener implements ServletContextListener{
@@ -50,6 +52,10 @@ public class AppListener implements ServletContextListener{
             
             initializelog += "Creating Livro table if not exists...";
             stmt.execute(Livro.getCreateStatement());
+            initializelog += "done;";
+            
+            initializelog += "Creating emprestimo table if not exists...";
+            stmt.execute(Emprestimo.getCreateStatement());
             initializelog += "done;";
             
             stmt.close();

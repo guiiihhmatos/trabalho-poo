@@ -6,10 +6,10 @@
         <title>Biblioteca - Empréstimos</title>
         <script src="exibirDadosTable.js"></script>
         <script>
-            var campos = ["titulo", "autor", "editora", "ano_publicacao", "disponibilidade", "isbn", "descricao"]; // Especifica as colunas desejadas
-            var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
+            var campos = ["nome_usuario", "titulo_livro", "editora", "ano_emprestimo"]; // Especifica as colunas desejadas
+            var titulos = ["Nome do Usuario", "Titulo do livro", "Ano do Emprestimo"]; // Especifica os tí­tulos personalizados      
             window.onload = function () {
-                listarLivros();
+                listarEmprestimos();
                 //desabilitar campos de edição
                 for (var i = 0; i < campos.length; i++) {
                     var campo = campos[i];
@@ -18,9 +18,9 @@
                 document.getElementById("btnSalvar").disabled = true;
             };
 
-            function listarLivros() {
+            function listarEmprestimos() {
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", "${pageContext.request.contextPath}/api/livros", true);
+                xhr.open("GET", "${pageContext.request.contextPath}/api/emprestimo", true);
                 xhr.onreadystatechange = function () {
                     var errorContainer = document.getElementById("error-container");
                     errorContainer.style.display = "none";
@@ -45,10 +45,10 @@
     <body>
         <%@include file="WEB-INF/jspf/navbar.jspf"%>
         <%if(user!=null){ %>
-        <div class="m-2">
-            <h2>Empréstimos</h2>
-            <div id="dados-container"></div>
-        </div>
+            <div class="container">
+                <h3 class="my-5">Lista de Empréstimos</h2>
+                <div id="dados-container"></div>
+            </div>
         <%}%>
         <%@include file="WEB-INF/jspf/html-body-libs.jspf"%>
     </body>
