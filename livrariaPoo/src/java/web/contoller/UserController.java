@@ -70,9 +70,9 @@ public class UserController {
     }     
 
     @DELETE
-    @Path("/{rowId}")
-    public Response deleteUser(@PathParam("rowId") Long rowId) throws Exception {
-        boolean excluido = User.deleteUser(rowId);        
+    @Path("/{login}")
+    public Response deleteUser(@PathParam("login") String login) throws Exception {
+        boolean excluido = User.deleteUser(login);        
         if (excluido) {
             return Response.ok().entity("User excluído com sucesso").build();
         } else {

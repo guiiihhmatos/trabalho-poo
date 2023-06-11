@@ -55,7 +55,7 @@
         for (var i = 0; i < campos.length; i++) {
             var campo = campos[i];
             var valor = document.getElementById(campo).value;
-            if (valor === "" && campo !== "disponibilidade") {
+            if (valor.trim() === "" && campo !== "disponibilidade") {
               camposInvalidos.push(titulos[i]);
             }
             if(campo === "disponibilidade"){

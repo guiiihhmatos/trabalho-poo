@@ -3,26 +3,21 @@ function exibirDados(lista, colunas, titulos) {
    //add table id
   table.setAttribute("id", "table");
   table.classList.add("table");
-  table.classList.add("table-bordered");
-  table.classList.add("table-striped");
 
   var thead = document.createElement("thead");
   var trHead = document.createElement("tr");
-  
-  thead.classList.add("thead-dark");
-  thead.classList.add("text-center");
-  
+
   for (var i = 0; i < colunas.length; i++) {
     var th = document.createElement("th");
     th.innerText = titulos[i];
     th.setAttribute("data-coluna", colunas[i]);
+   // th.setAttribute("id", colunas[i]);
     trHead.appendChild(th);
   }
 
   thead.appendChild(trHead);
 
   var tbody = document.createElement("tbody");
-  tbody.classList.add("text-center");
 
   for (var i = 0; i < lista.length; i++) {
     var item = lista[i];
@@ -31,15 +26,6 @@ function exibirDados(lista, colunas, titulos) {
     for (var j = 0; j < colunas.length; j++) {
       var coluna = colunas[j];
       var td = document.createElement("td");
-      
-      if(colunas[j] == "disponibilidade")
-      {
-          if(item[coluna])
-              td.innerText = "Disponível";
-          else td.innerText = "Indisponível";
-          trItem.appendChild(td);
-          continue;
-      }
       td.innerText = item[coluna];
            
       trItem.appendChild(td);
@@ -73,6 +59,18 @@ function exibirDados(lista, colunas, titulos) {
   // Adicionar funcionalidades de filtragem e ordenação
   adicionarFuncionalidades(table);
 
+  var primeiraCelula = trHead.querySelector("th");
+  ordenarTabela(table, primeiraCelula);
+  // Cria um novo evento de clique
+//  var eventoClique = new MouseEvent("click", {
+  //  bubbles: true,
+    //cancelable: true,
+    //view: window
+  //});
+
+  // Dispara o evento de clique no elemento do título da coluna para ordenar a tabela
+  //primeiraCelula.dispatchEvent(eventoClique);
+
   return table;
 }
 
@@ -87,7 +85,6 @@ function adicionarFuncionalidades(table) {
   }
 
   var filtroInput = document.createElement("input");
-  filtroInput.classList.add("form-control");
   filtroInput.setAttribute("type", "text");
   filtroInput.setAttribute("placeholder", "Filtrar...");
   filtroInput.addEventListener("input", function () {
@@ -182,7 +179,8 @@ destaqueStyles.innerHTML = `
   background-color: #f2f2f2;
 }
 .destaque2 {
-  background-color: #f2f2f2;
+  background-color: #265a88;
+  color: white;  
 }
 `;
 document.head.appendChild(destaqueStyles);

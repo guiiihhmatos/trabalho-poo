@@ -161,14 +161,14 @@ public class User {
         return rowsAffected > 0;
     }
     
-    public static boolean deleteUser(long rowId) throws Exception{
+    public static boolean deleteUser(String login) throws Exception{
         
         Connection conexao = AppListener.getConnection();
-        String sql = "DELETE FROM users WHERE rowid=?";
+        String sql = "DELETE FROM users WHERE login=?";
         
         PreparedStatement stmt = conexao.prepareStatement(sql);
         
-        stmt.setLong(1, rowId);
+        stmt.setString(1, login);
         int rowsAffected = stmt.executeUpdate();
         conexao.close();
         stmt.close();
