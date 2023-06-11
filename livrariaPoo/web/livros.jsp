@@ -11,8 +11,89 @@
     }
   </style>
   <script src="grid.js"></script>
-  <script>
-    var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
+</head>
+<body>
+<%@include file="WEB-INF/jspf/navbar.jspf"%>
+ <%if(user!=null){ %>
+  <div class="container">
+     
+    <div class="row">
+      <div class="col-md-8">
+        <div class="table-container d-flex flex-column align-items-center">
+          <!-- Espaço para a tabela -->	
+          
+          <h3 class="my-5">Lista de livros</h3>
+            <div id="dados-container"></div>
+            
+            <div class="d-flex justify-content-around align-items-center w-25">
+                <%if(user.getRole().equals("USER")){ %>
+                <button class="btn btn-primary" id="btnEmprestimo" onclick="alugarLivro()">Alugar</button>
+                <%}%>
+                
+                <%if(user.getRole().equals("ADMIN")){ %>
+                <button class="btn btn-primary" onclick="novoLivroForm()">Novo</button>
+                <button class="btn btn-danger" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>
+                <%}%>
+            </div>
+            
+        </div>
+      </div>
+      <%if(user.getRole().equals("ADMIN")){ %>
+      <div class="col-md-4">
+          
+          <h3 class="my-5 text-center">Cadastrar novo livro</h3>
+          
+        <form id="myForm" class="mb-5">
+          <div id="error-container" style="display: none; color: red;"></div>
+          <!-- campos do formulário dinâmicos -->
+          <div id="form-fields">
+
+            <div class="mb-3">
+              <label for="isbn">Isbn</label>
+              <input type="text" class="form-control w-100" id="isbn" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="titulo">Tí­tulo</label>
+              <input type="text" class="form-control" id="titulo" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="autor">Autor</label>
+              <input type="text" class="form-control" id="autor" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="editora">Editora</label>
+              <input type="text" class="form-control" id="editora" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="ano_publicacao">Ano</label>
+              <input type="number" class="form-control" id="ano_publicacao" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="disponibilidade">Disponibilidade</label>
+              <input type="checkbox" class="form-check-input" id="disponibilidade" disabled>
+            </div>
+
+            <div class="mb-3">
+              <label for="descricao">Descrição</label>
+              <input type="text" class="form-control" id="descricao" disabled>
+          </div>
+            <input type="hidden" name="metodo" id="metodo" value="post">
+          </div>
+          <button type="button" onclick="submitForm()" class="btn btn-primary" id="btnSalvar">Salvar</button>
+        </form>
+      </div>
+      <%}%>
+    </div>
+  </div>
+
+    <script>
+        
+  var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
     var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
     window.onload = function() {        
         listarLivros();
@@ -45,8 +126,9 @@
           }
       };
       xhr.send();
-    }
-    function submitForm() {
+    }         
+        
+        function submitForm() {
         var data = {};        
         //validação dos campos do formulário
         var errorContainer = document.getElementById("error-container");
@@ -135,7 +217,9 @@
         }
         document.getElementById("btnSalvar").disabled = false;
         document.getElementById("btnDeletar").disabled = false;
+        <%if(user.getRole().equals("USER")){ %>
         document.getElementById("btnEmprestimo").disabled = false;
+        <%}%>
     }
 
     function deletarSelectedItemGrid(){
@@ -190,88 +274,8 @@
 
         document.getElementById("btnDeletar").disabled = true;
         document.getElementById('metodo').value = 'post';
-    }
+    }  
     </script>
-</head>
-<body>
-<%@include file="WEB-INF/jspf/navbar.jspf"%>
- <%if(user!=null){ %>
-  <div class="container">
-     
-    <div class="row">
-      <div class="col-md-8">
-        <div class="table-container d-flex flex-column align-items-center">
-          <!-- Espaço para a tabela -->	
-          
-          <h3 class="my-5">Lista de livros</h3>
-            <div id="dados-container"></div>
-            
-            <div class="d-flex justify-content-around align-items-center w-25">
-                <%if(user.getRole().equals("USER")){ %>
-                <button class="btn btn-primary" id="btnEmprestimo" onclick="alugarLivro()">Alugar</button>
-                <%}%>
-                
-                <%if(user.getRole().equals("ADMIN")){ %>
-                <button class="btn btn-primary" onclick="novoLivroForm()">Novo</button>
-                <button class="btn btn-danger" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>
-                <%}%>
-            </div>
-            
-        </div>
-      </div>
-      <%if(user.getRole().equals("ADMIN")){ %>
-      <div class="col-md-4">
-          
-          <h3 class="my-5 text-center">Cadastrar novo livro</h3>
-          
-        <form id="myForm" class="mb-5">
-          <div id="error-container" style="display: none; color: red;"></div>
-          <!-- campos do formulário dinâmicos -->
-          <div id="form-fields">
-
-            <div class="mb-3">
-              <label for="isbn">Isbn</label>
-              <input type="text" class="form-control w-100" id="isbn" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label for="titulo">Tí­tulo</label>
-              <input type="text" class="form-control" id="titulo" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label for="autor">Autor</label>
-              <input type="text" class="form-control" id="autor" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label for="editora">Editora</label>
-              <input type="text" class="form-control" id="editora" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label for="ano_publicacao">Ano</label>
-              <input type="number" class="form-control" id="ano_publicacao" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label for="disponibilidade">Disponibilidade</label>
-              <input type="checkbox" class="form-check-input" id="disponibilidade" disabled>
-            </div>
-
-            <div class="mb-3">
-              <label for="descricao">Descrição</label>
-              <input type="text" class="form-control" id="descricao" disabled>
-          </div>
-            <input type="hidden" name="metodo" id="metodo" value="post">
-          </div>
-          <button type="button" onclick="submitForm()" class="btn btn-primary" id="btnSalvar">Salvar</button>
-        </form>
-      </div>
-      <%}%>
-    </div>
-  </div>
-
   <%}%>
 
   <%@include file="WEB-INF/jspf/html-body-libs.jspf"%>
