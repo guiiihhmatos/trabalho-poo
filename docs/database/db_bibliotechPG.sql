@@ -1,7 +1,7 @@
-CREATE TABLE editora (
-  cd_editora INTEGER   NOT NULL ,
-  nm_editora VARCHAR(50)      ,
-PRIMARY KEY(cd_editora));
+--CREATE TABLE editora (
+  --cd_editora INTEGER   NOT NULL ,
+  --nm_editora VARCHAR(50)      ,
+--PRIMARY KEY(cd_editora));
 
 
 
@@ -18,10 +18,10 @@ PRIMARY KEY(cd_usuario));
 
 
 
-CREATE TABLE autor (
-  cd_autor INTEGER   NOT NULL ,
-  nm_autor VARCHAR(50)      ,
-PRIMARY KEY(cd_autor));
+--CREATE TABLE autor (
+  --cd_autor INTEGER   NOT NULL ,
+  --nm_autor VARCHAR(50)      ,
+--PRIMARY KEY(cd_autor));
 
 
 
@@ -69,16 +69,15 @@ CREATE TABLE emprestimo (
   usuario_cd_usuario INTEGER   NOT NULL ,
   dt_emprestimo DATE    ,
   dt_devolucao DATE      ,
-PRIMARY KEY(cd_emprestimo)    ,
+  PRIMARY KEY(cd_emprestimo),
   FOREIGN KEY(usuario_cd_usuario)
     REFERENCES usuario(cd_usuario),
   FOREIGN KEY(livro_cd_livro)
-    REFERENCES livro(cd_livro));
-
+    REFERENCES livro(cd_livro)
+);
 
 CREATE INDEX emprestimo_FKIndex1 ON emprestimo (usuario_cd_usuario);
 CREATE INDEX emprestimo_FKIndex2 ON emprestimo (livro_cd_livro);
-
 
 CREATE INDEX IFK_Rel_05 ON emprestimo (usuario_cd_usuario);
 CREATE INDEX IFK_Rel_06 ON emprestimo (livro_cd_livro);
