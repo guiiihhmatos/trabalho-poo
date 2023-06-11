@@ -28,7 +28,7 @@ public class Emprestimo {
                 +"idLivro BIGINT NOT NULL,"
                 +"data_emprestimo datetime NOT NULL,"
                 +"Foreign key(idLivro) REFERENCES livro(rowId),"
-                +"Foreign key(idUsuario) REFERENCES users(rowId),"
+                +"Foreign key(idUsuario) REFERENCES users(rowId)"
                 +");";      
     }
 
