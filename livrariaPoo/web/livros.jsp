@@ -35,7 +35,7 @@
                 <button class="btn btn-danger" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>
                 <%}%>
             </div>
-            
+        <div id="error-container" style="display: none; color: red;"></div>            
         </div>
       </div>
       <%if(user.getRole().equals("ADMIN")){ %>
@@ -44,8 +44,7 @@
           <h3 class="my-5 text-center">Cadastrar novo livro</h3>
           
         <form id="myForm" class="mb-5">
-          <div id="error-container" style="display: none; color: red;"></div>
-          <!-- campos do formulário dinâmicos -->
+          
           <div id="form-fields">
 
             <div class="mb-3">
@@ -94,28 +93,39 @@
     <script>
         
   var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
-    var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disponibilidade", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
+    var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disp.", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
     window.onload = function() {        
         listarLivros();
+        
+         <%if(user.getRole().equals("ADMIN")){ %>                
         //desabilitar campos de edição
         for (var i = 0; i < campos.length; i++) {
             var campo = campos[i];
             document.getElementById(campo).disabled = true;
         }
         document.getElementById("btnSalvar").disabled = true;            
+        <%}%>
     };
     
     function listarLivros() {
+      <%if(user.getRole().equals("ADMIN")){ %>  
+      var url = "${pageContext.request.contextPath}/api/livros"
+      <%}else{%>
+      var url = "${pageContext.request.contextPath}/api/livros/disponiveis"
+      <%}%>
+        
       var xhr = new XMLHttpRequest();
-      xhr.open("GET", "${pageContext.request.contextPath}/api/livros", true);
+      xhr.open("GET", url, true);
       xhr.onreadystatechange = function () {
           var errorContainer = document.getElementById("error-container");
           errorContainer.style.display = "none";
           if (xhr.readyState === 4 && xhr.status === 200) {
               var lista = JSON.parse(xhr.responseText);     
               var table = exibirDados(lista, campos, titulos);
-              //registro do evento de click na tabela
+             <%if(user.getRole().equals("ADMIN")){ %>  
+                //registro do evento de click na tabela para edicao via form
               table.addEventListener("click", clickGrid);
+             <%}%>
               var container = document.getElementById("dados-container");
               // Limpa o conteúdo existente definindo innerHTML como uma string vazia
               container.innerHTML = '';
@@ -156,6 +166,7 @@
         var errorContainer = document.getElementById("error-container");
         //recupera method do form
         var metodo = document.getElementById("metodo").value;
+        
         fetch( "${pageContext.request.contextPath}/api/livros", {
             method: metodo,
             headers: {
