@@ -95,7 +95,9 @@
     var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
     var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disp.", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
     var livroSelParaLocacao = "";
-    window.onload = function() {        
+    var errorContainer = document.getElementById("error-container");
+    window.onload = function() {   
+        errorContainer.style.display = "none";
         listarLivros();
         
          <%if(user.getRole().equals("ADMIN")){ %>                
@@ -118,8 +120,6 @@
       var xhr = new XMLHttpRequest();
       xhr.open("GET", url, true);
       xhr.onreadystatechange = function () {
-          var errorContainer = document.getElementById("error-container");
-          errorContainer.style.display = "none";
           if (xhr.readyState === 4 && xhr.status === 200) {
               var lista = JSON.parse(xhr.responseText);     
               var table = exibirDados(lista, campos, titulos);
