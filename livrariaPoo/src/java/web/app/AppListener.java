@@ -11,7 +11,6 @@ import java.util.Date;
 import model.Emprestimo;
 import model.Livro;
 import model.User;
-import static web.AppListener.initializelog;
 
 @WebListener
 public class AppListener implements ServletContextListener{
@@ -40,13 +39,7 @@ public class AppListener implements ServletContextListener{
             {
                 initializelog += "Adding default users...";
                 User.insertUser("admin", "Administrador", "ADMIN", "1234");
-                initializelog += "Admin added";
-                
-                User.insertUser("guilherme", "Guilherme Matos Santana", "USER", "1234");
-                initializelog += "Guilherme added";
-                
-                User.insertUser("raquel", "Raquel Facchini Batista Franco", "USER", "12345");
-                initializelog += "Raquel added";
+                initializelog += "Admin added";                
             }
             initializelog += "done;";
             

@@ -1,9 +1,5 @@
 package web.commons;
 
-import exceptions.UserNaoAutentException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +7,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 import java.util.stream.Collectors;
-import model.User;
+import exceptions.HttpErrorCodeException;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class RequestUtils {
 
@@ -29,53 +29,108 @@ public class RequestUtils {
         }
     }
     
-    public static String makePutRequest(String login, String password) throws IOException, Exception {
-        URL url = new URL("http://localhost:8080/livrariaPoo/api/session");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("PUT");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
+    public static String makeRequest(String pUrl, String payload, String method) throws IOException, Exception {
+        String result = null;
+        InputStream errorStream = null;
+        Integer statusCode = null;
+        try {
+            URL url = new URL(pUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(method);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
 
-        User user = new User(login, password);
-        String payload = JsonUtils.toJson(user);
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(payload.getBytes("UTF-8"));
+            outputStream.close();
 
-        OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(payload.getBytes("UTF-8"));
-        outputStream.close();
+            statusCode = connection.getResponseCode();
 
-        // Realize a chamada HTTP PUT e obtenha o status code da resposta
-        int statusCode = connection.getResponseCode();
-
-        // Verifique o status code e tome a ação apropriada
-        if (statusCode == HttpURLConnection.HTTP_FORBIDDEN) {
-            // O servidor retornou o status HTTP 403 Forbidden
-                // Recupere a mensagem de erro
-            InputStream errorStream = connection.getErrorStream();
-            if (errorStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
-                String line;
-                StringBuilder errorMessage = new StringBuilder();
-                while ((line = reader.readLine()) != null) {
-                    errorMessage.append(line);
-                }
-                reader.close();
-                System.out.println("Mensagem de erro: " + errorMessage.toString());
-                String errorMsg = errorMessage.toString();
-               // errorMsg = errorMsg.replace("{", "").replace("}", "");
-                throw new UserNaoAutentException(errorMsg);
+            errorStream = connection.getErrorStream();
+            
+            if(errorStream != null){
+            	String contentType = connection.getContentType();
+            	 if (contentType.contains("text/html")) {
+                 	htmlContent(errorStream, statusCode);
+                 }else {
+                	 handleHttpError(errorStream, statusCode);
+                 }
+            } else{
+                result = handleHttpSuccess(connection.getInputStream());
             }
-        } 
+            connection.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if(e instanceof HttpErrorCodeException){
+                throw e;
+            }
+            if (errorStream != null) {
+                handleHttpError(errorStream, statusCode);
+            } else {
+                final Map retorno = jsonb.fromJson(e.getMessage(), Map.class);
+                throw new Exception(retorno.get("message").toString());
+            }
+        }
+        return result;
+    }
 
+	private static void htmlContent(InputStream errorStream, Integer statusCode) throws IOException, HttpErrorCodeException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+		String line;
+		StringBuilder errorMessage = new StringBuilder();
+		while ((line = reader.readLine()) != null) {
+			errorMessage.append(line);
+		}
+		reader.close();
+
+		// Extrair o conteúdo do corpo dentro da tag <body>
+		String htmlContent = errorMessage.toString();
+		//Document doc = Jsoup.parse(htmlContent);
+		//Element bodyElement = doc.body();
+		//String bodyContent = bodyElement.html();
+
+		System.out.println("Conteúdo do html: " + htmlContent);
+		throw new HttpErrorCodeException(htmlContent);
+	}
+
+    private static String handleHttpSuccess(InputStream inputStream) throws IOException {
         StringBuilder responseContent = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
         while ((line = reader.readLine()) != null) {
             responseContent.append(line);
         }
         reader.close();
-
         return responseContent.toString();
+    }
+
+    private static void handleHttpError(InputStream errorStream, Integer responseCode) throws IOException, Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+        String line;
+        StringBuilder errorMessage = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            errorMessage.append(line);
+        }
+        reader.close();
+        System.out.println(errorMessage.toString());
+        String errorMsg = errorMessage.toString();
+        System.out.println(errorMsg);
+        final Map retorno = jsonb.fromJson(errorMsg, Map.class);
+        String result = retorno.get("message").toString();
+        if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            // Código 404 - Recurso não encontrado
+            result = "O recurso solicitado não foi encontrado no serviço REST.";
+        } else if (responseCode == HttpURLConnection.HTTP_INTERNAL_ERROR && (result == null || result.trim().isEmpty()) ) {
+            // Código 500 - Erro interno do servidor
+            result = "O serviço REST encontrou um erro interno.";
+        } else {
+            // Outros códigos de resposta HTTP e mensagens em branco
+            if (result == null || result.trim().isEmpty()) {
+                result = "A chamada ao serviço REST retornou um código HTTP: " + responseCode;
+            }
+        }
+        throw new HttpErrorCodeException(result);
     }
     
     public static String getHttpBody(BufferedReader reader) throws IOException{

@@ -5,7 +5,7 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ page import="web.commons.RequestUtils" %>
 <%@ page import="model.User" %>
-<%@ page import="exceptions.UserNaoAutentException"%>
+<%@ page import="exceptions.HttpErrorCodeException"%>
 <%@ page import="web.commons.JsonUtils"%>
 <%
 	if(application.getAttribute("listaUsers")==null){
@@ -19,17 +19,18 @@
             try {
                 String login = request.getParameter("session-login");
                 String password = request.getParameter("session-pass");                
-                String resp = RequestUtils.makePutRequest(login, password);                
-                user = JsonUtils.fromJson(resp, User.class);                
+                String payload = JsonUtils.toJson(new User(login, password));       
+                String url = request.getRequestURL().toString().replace(request.getRequestURI(), "") + request.getContextPath() + "/api/session/authenticate";
+                String resp = RequestUtils.makeRequest(url, payload, "PUT");                
+                user = JsonUtils.fromJson(resp, User.class);         
                 request.getSession(true).setAttribute("user", user);                
                 listaUsersArray.add(user);
                 user.setSessionId(request.getSession().getId());
                 sessionMap.put(request.getSession().getId(),request.getSession());
-            } catch (UserNaoAutentException una) {                
-                // Armazena a mensagem de erro em um atributo de escopo de solicitação
-                request.setAttribute("err_msg", una.getMessage());
+            } catch(HttpErrorCodeException httpErr){
+                request.setAttribute("err_msg", httpErr.getMessage());
             } catch (Exception e) {
-                request.setAttribute("err_msg", "Ocorreu um erro: " + e.getMessage());
+                request.setAttribute("err_msg", e.getMessage());
             }			
 	}else if(request.getParameter("session-out")!= null){
 		listaUsersArray.remove(session.getAttribute("user"));
