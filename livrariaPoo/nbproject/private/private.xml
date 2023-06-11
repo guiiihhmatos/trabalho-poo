@@ -3,16 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/src/java/web/contoller/UserController.java</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/src/java/web/contoller/LivroController.java</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/src/java/web/app/AuthenticationFilter.java</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/web/sessions.jsp</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/src/java/model/User.java</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/src/java/web/app/AppListener.java</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/web/users.jsp</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/web/index.jsp</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/web/livros.jsp</file>
-            <file>file:/C:/Users/guilhermesantana/Documents/trabalho-poo/livrariaPoo/src/java/web/contoller/SessionController.java</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/web/usuarios.jsp</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/web/sessions.jsp</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/src/java/web/app/AuthenticationFilter.java</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/web/WEB-INF/jspf/navbar.jspf</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/src/java/web/contoller/SessionController.java</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/web/livros.jsp</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/src/java/web/app/AppListener.java</file>
+            <file>file:/C:/Users/fabio/OneDrive/Documents/trabalho-poo/livrariaPoo/web/grid.js</file>
         </group>
     </open-files>
 </project-private>

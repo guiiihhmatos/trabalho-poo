@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.Date;
+import model.Emprestimo;
 import model.Livro;
 import model.User;
 
@@ -39,17 +40,15 @@ public class AppListener implements ServletContextListener{
                 initializelog += "Adding default users...";
                 User.insertUser("admin", "Administrador", "ADMIN", "1234");
                 initializelog += "Admin added";
-                
-                User.insertUser("guilherme", "Guilherme Matos Santana", "USER", "1234");
-                initializelog += "Guilherme added";
-                
-                User.insertUser("raquel", "Raquel Facchini Batista Franco", "USER", "12345");
-                initializelog += "Raquel added";
             }
             initializelog += "done;";
             
             initializelog += "Creating Livro table if not exists...";
             stmt.execute(Livro.getCreateStatement());
+            initializelog += "done;";
+            
+            initializelog += "Creating emprestimo table if not exists...";
+            stmt.execute(Emprestimo.getCreateStatement());
             initializelog += "done;";
             
             stmt.close();

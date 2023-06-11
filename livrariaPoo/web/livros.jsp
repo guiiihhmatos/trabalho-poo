@@ -135,6 +135,7 @@
         }
         document.getElementById("btnSalvar").disabled = false;
         document.getElementById("btnDeletar").disabled = false;
+        document.getElementById("btnEmprestimo").disabled = false;
     }
 
     function deletarSelectedItemGrid(){
@@ -206,12 +207,19 @@
             <div id="dados-container"></div>
             
             <div class="d-flex justify-content-around align-items-center w-25">
+                <%if(user.getRole().equals("USER")){ %>
+                <button class="btn btn-primary" id="btnEmprestimo" onclick="alugarLivro()">Alugar</button>
+                <%}%>
+                
+                <%if(user.getRole().equals("ADMIN")){ %>
                 <button class="btn btn-primary" onclick="novoLivroForm()">Novo</button>
                 <button class="btn btn-danger" id="btnDeletar" disabled onclick="deletarSelectedItemGrid()">Deletar</button>
+                <%}%>
             </div>
             
         </div>
-      </div>      
+      </div>
+      <%if(user.getRole().equals("ADMIN")){ %>
       <div class="col-md-4">
           
           <h3 class="my-5 text-center">Cadastrar novo livro</h3>
@@ -260,10 +268,12 @@
           <button type="button" onclick="submitForm()" class="btn btn-primary" id="btnSalvar">Salvar</button>
         </form>
       </div>
+      <%}%>
     </div>
   </div>
 
   <%}%>
+
   <%@include file="WEB-INF/jspf/html-body-libs.jspf"%>
 </body>
 </html>

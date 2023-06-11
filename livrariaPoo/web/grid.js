@@ -1,12 +1,17 @@
 function exibirDados(lista, colunas, titulos) {
   var table = document.createElement("table");
    //add table id
-  table.setAttribute("id", "table");
+   table.setAttribute("id", "table");
   table.classList.add("table");
+  table.classList.add("table-bordered");
+  table.classList.add("table-striped");
 
   var thead = document.createElement("thead");
   var trHead = document.createElement("tr");
 
+
+  thead.classList.add("thead-dark");
+  thead.classList.add("text-center");
   for (var i = 0; i < colunas.length; i++) {
     var th = document.createElement("th");
     th.innerText = titulos[i];
@@ -14,7 +19,7 @@ function exibirDados(lista, colunas, titulos) {
    // th.setAttribute("id", colunas[i]);
     trHead.appendChild(th);
   }
-
+  
   thead.appendChild(trHead);
 
   var tbody = document.createElement("tbody");
@@ -85,6 +90,7 @@ function adicionarFuncionalidades(table) {
   }
 
   var filtroInput = document.createElement("input");
+  filtroInput.classList.add("form-control");
   filtroInput.setAttribute("type", "text");
   filtroInput.setAttribute("placeholder", "Filtrar...");
   filtroInput.addEventListener("input", function () {
