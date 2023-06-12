@@ -104,11 +104,6 @@
                 document.getElementById("btnSalvar").disabled = true;
                 document.getElementById("btnDeletar").disabled = true;
             } 
-            return response.json();                              
-          }).then(data => {
-                    errorContainer.innerText = "Erro: " + data.message;
-                    errorContainer.style.display = "block";                   
-            console.log('Resposta:', data);             
         }).catch(error => {              
             errorContainer.innerText = "Erro: " + error;
             errorContainer.style.display = "block";
@@ -183,12 +178,7 @@
                 }
                 document.getElementById("passwordHash").disabled=true;
                 document.getElementById("btnSalvar").disabled = true;
-            } 
-            return response.json();                              
-          }).then(data => {
-                    errorContainer.innerText = "Erro: " + data.message;
-                    errorContainer.style.display = "block";                   
-            console.log('Resposta:', data);             
+            }             
         }).catch(error => {              
             errorContainer.innerText = "Erro: " + error;
             errorContainer.style.display = "block";

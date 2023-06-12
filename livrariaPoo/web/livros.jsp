@@ -134,8 +134,10 @@
               container.innerHTML = '';
               container.appendChild(table);                                        
           } else {                   
-              errorContainer.innerText = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente mais tarde.";
-              errorContainer.style.display = "block";
+              if(xhr.status != 200){
+                  errorContainer.innerText = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente mais tarde.";
+                  errorContainer.style.display = "block";
+              }
           }
       };
       xhr.send();
@@ -162,11 +164,6 @@
                 }
                 document.getElementById("btnSalvar").disabled = true;
             } 
-            return response.json();                              
-          }).then(data => {
-                    errorContainer.innerText = "Erro: " + data.message;
-                    errorContainer.style.display = "block";                   
-            console.log('Resposta:', data);             
         }).catch(error => {              
             errorContainer.innerText = "Erro: " + error;
             errorContainer.style.display = "block";
@@ -218,11 +215,6 @@
                 }
                 document.getElementById("btnSalvar").disabled = true;
             } 
-            return response.json();                              
-          }).then(data => {
-                    errorContainer.innerText = "Erro: " + data.message;
-                    errorContainer.style.display = "block";                   
-            console.log('Resposta:', data);             
         }).catch(error => {              
             errorContainer.innerText = "Erro: " + error;
             errorContainer.style.display = "block";
@@ -303,11 +295,6 @@
                 document.getElementById("btnSalvar").disabled = true;
                 document.getElementById("btnDeletar").disabled = true;
             } 
-            return response.json();                              
-          }).then(data => {
-                    errorContainer.innerText = "Erro: " + data.message;
-                    errorContainer.style.display = "block";                   
-            console.log('Resposta:', data);             
         }).catch(error => {              
             errorContainer.innerText = "Erro: " + error;
             errorContainer.style.display = "block";
