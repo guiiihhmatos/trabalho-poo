@@ -23,6 +23,7 @@ function exibirDados(lista, colunas, titulos) {
   thead.appendChild(trHead);
 
   var tbody = document.createElement("tbody");
+  tbody.classList.add("text-center");
 
   for (var i = 0; i < lista.length; i++) {
     var item = lista[i];
@@ -31,7 +32,23 @@ function exibirDados(lista, colunas, titulos) {
     for (var j = 0; j < colunas.length; j++) {
       var coluna = colunas[j];
       var td = document.createElement("td");
-      td.innerText = item[coluna];
+      
+      if(colunas[j] == "disponibilidade")
+      {
+          if(item[coluna])
+          {
+              td.innerText = "Disponível";
+          }
+          else
+          {
+              td.innerText = "Indisponível";
+          }
+      }
+      else
+      {
+          td.innerText = item[coluna];
+      }
+      
            
       trItem.appendChild(td);
     }

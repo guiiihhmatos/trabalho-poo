@@ -36,7 +36,7 @@
             }       
         %>
             <div class="container text-center">
-                <h1 class="my-5">Usuários Conectados</h1>
+                <h3 class="my-5">Usuários Conectados</h3>
                 <table class="table table-bordered table-striped" style="max-height: 300px; overflow-y: auto;">
                         <thead class="thead-dark text-center">
                                 <tr>
