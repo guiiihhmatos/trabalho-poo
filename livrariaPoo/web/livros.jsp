@@ -95,8 +95,9 @@
     var campos = ["titulo", "autor", "editora", "ano_publicacao","disponibilidade", "isbn", "descricao" ]; // Especifica as colunas desejadas
     var titulos = ["Tí­tulo", "Autor", "Editora", "Ano", "Disp.", "Isbn", "Descrição"]; // Especifica os tí­tulos personalizados      
     var livroSelParaLocacao = "";
-    var errorContainer = document.getElementById("error-container");
-    window.onload = function() {   
+    var errorContainer ;
+    window.onload = function() {  
+        errorContainer = document.getElementById("error-container");
         errorContainer.style.display = "none";
         listarLivros();
         
@@ -155,14 +156,8 @@
             body: jsonData
         }).then(response => {              
             if(response.ok){
-                listarLivros();                   
-                //desabilitar campos de edição
-                for (var i = 0; i < campos.length; i++) {
-                    var campo = campos[i];
-                    document.getElementById(campo).value = "";
-                    document.getElementById(campo).disabled = true;
-                }
-                document.getElementById("btnSalvar").disabled = true;
+                listarLivros();
+                document.getElementById("btnEmprestimo").disabled = true;
             } 
         }).catch(error => {              
             errorContainer.innerText = "Erro: " + error;
@@ -171,8 +166,7 @@
     }
         function submitForm() {
         var data = {};   
-        //validação dos campos do formulário
-        var errorContainer = document.getElementById("error-container");
+        //validação dos campos do formulário        
         errorContainer.style.display = "none";
         var camposInvalidos = [];
         for (var i = 0; i < campos.length; i++) {
@@ -193,8 +187,7 @@
             return;
         }
       
-        var jsonData = JSON.stringify(data);
-        var errorContainer = document.getElementById("error-container");
+        var jsonData = JSON.stringify(data);        
         //recupera method do form
         var metodo = document.getElementById("metodo").value;
         
@@ -231,8 +224,7 @@
         // Obtém uma referência ao elemento do campo oculto
         document.getElementById('metodo').value = 'put';
         // desabilita campo isbn (chave primária)
-        document.getElementById("isbn").disabled = true;
-        var errorContainer = document.getElementById("error-container");
+        document.getElementById("isbn").disabled = true;        
         errorContainer.style.display = "none";        
     }
     
@@ -274,8 +266,7 @@
         var isbn = document.getElementById("isbn").value;
         if(isbn === ""){
             return;
-        }
-        var errorContainer = document.getElementById("error-container");
+        }        
         errorContainer.style.display = "none";
         
         fetch( "${pageContext.request.contextPath}/api/livros/" + isbn, {

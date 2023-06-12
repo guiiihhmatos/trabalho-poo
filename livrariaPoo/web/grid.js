@@ -4,7 +4,7 @@ function exibirDados(lista, colunas, titulos) {
    table.setAttribute("id", "table");
   table.classList.add("table");
   table.classList.add("table-bordered");
-  table.classList.add("table-striped");
+  //table.classList.add("table-striped");
 
   var thead = document.createElement("thead");
   var trHead = document.createElement("tr");

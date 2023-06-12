@@ -7,189 +7,11 @@
         <%@include file="WEB-INF/jspf/html-head-libs.jspf"%>
         <title>Biblioteca - Usuarios</title>
          <script src="grid.js"></script>
-        <script>
-            var campos = ["name", "login", "role"]; // Especifica as colunas desejadas
-            var titulos = ["Nome", "Login", "Função"]; // Especifica os tí­tulos personalizados
-
-            window.onload = function () {
-                listarUsuarios();
-
-                //desabilitar campos de edição
-                for (var i = 0; i < campos.length; i++) {
-                    var campo = campos[i];
-                    document.getElementById(campo).disabled = true;
-                }
-                document.getElementById("btnSalvar").disabled = true;
-            }
-
-            function listarUsuarios() {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "${pageContext.request.contextPath}/api/users", true);
-                xhr.onreadystatechange = function () {
-                    var errorContainer = document.getElementById("error-container");
-                    errorContainer.style.display = "none";
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        var lista = JSON.parse(xhr.responseText);
-                        var table = exibirDados(lista, campos, titulos);
-                        //registro do evento de click na tabela
-                        table.addEventListener("click", clickGrid);
-                        var container = document.getElementById("dados-container");
-                        // Limpa o conteúdo existente definindo innerHTML como uma string vazia
-                        container.innerHTML = '';
-                        container.appendChild(table);
-                    } else {
-                        errorContainer.innerText = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente mais tarde.";
-                        errorContainer.style.display = "block";
-                    }
-                };
-                xhr.send();
-            }
-
-    //funcao para capturar evento de click na tabela
-    function clickGrid(event) {
-        var table = document.getElementById("table");
-        var tr = table.getElementsByTagName("tr");
-        event.target.parentElement.classList.add("destaque2");
-        preencherCampos(event);
-        //habilita campos de edição
-        habilitaCamposEdicao();
-        // Obtém uma referência ao elemento do campo oculto
-        document.getElementById('metodo').value = 'put';
-        // desabilita campo isbn (chave primária)
-        document.getElementById("login").disabled = true;
-        var errorContainer = document.getElementById("error-container");
-        errorContainer.style.display = "none";        
-    }
-    function preencherCampos(event){
-        //preencher campos do formulário com dados da linha selecionada
-        var td = event.target.parentElement.getElementsByTagName("td");
-        for (var i = 0; i < campos.length; i++) {
-            var campo = campos[i];
-            document.getElementById(campo).value = td[i].innerText;
-        }
-    }
-    function habilitaCamposEdicao(){
-        for (var i = 0; i < campos.length; i++) {
-            var campo = campos[i];
-            document.getElementById(campo).removeAttribute("disabled");
-        }        
-        document.getElementById("passwordHash").removeAttribute("disabled");            
-        document.getElementById("btnSalvar").disabled = false;
-        document.getElementById("btnDeletar").disabled = false;
-    }
-
-    function deletarSelectedItemGrid(){
-        var login = document.getElementById("login").value;
-        if(login === ""){
-            return;
-        }
-        var errorContainer = document.getElementById("error-container");
-        errorContainer.style.display = "none";
-        
-        fetch( "${pageContext.request.contextPath}/api/users/" + login, {
-            method: 'delete',
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(response => {              
-            if(response.ok){
-                listarUsuarios();                   
-                //desabilitar campos de edição
-                for (var i = 0; i < campos.length; i++) {
-                    var campo = campos[i];
-                    document.getElementById(campo).value = "";
-                    document.getElementById(campo).disabled = true;
-                }
-                document.getElementById("passwordHash").disabled=true;
-                document.getElementById("btnSalvar").disabled = true;
-                document.getElementById("btnDeletar").disabled = true;
-            } 
-        }).catch(error => {              
-            errorContainer.innerText = "Erro: " + error;
-            errorContainer.style.display = "block";
-        });
-    }
-
-    function novoForm() {
-        for (var i = 0; i < campos.length; i++) {
-            document.getElementById(campos[i]).value = "";
-            document.getElementById(campos[i]).removeAttribute("disabled");
-        }
-        document.getElementById("passwordHash").value = "";
-        document.getElementById("passwordHash").removeAttribute("disabled");
-
-        document.getElementById("btnSalvar").disabled = false;
-        document.getElementById("error-container").innerHTML = "";
-        var table = document.getElementById("table");
-        var tr = table.getElementsByTagName("tr");
-        for (var i = 0; i < tr.length; i++) {
-            tr[i].classList.remove("destaque2");
-        }
-
-        document.getElementById("btnDeletar").disabled = true;
-        document.getElementById('metodo').value = 'post';
-    }
-    function submitForm() {
-        var data = {};        
-        //validação dos campos do formulário
-        var errorContainer = document.getElementById("error-container");
-        errorContainer.style.display = "none";
-        var camposInvalidos = [];
-        for (var i = 0; i < campos.length; i++) {
-            var campo = campos[i];
-            var valor = document.getElementById(campo).value;
-            if (valor.trim() === "") {
-              camposInvalidos.push(titulos[i]);
-            }
-            //preenche objeto data com os campos do formulário
-            data[campo] = valor;
-        }
-        var passwordHash = document.getElementById("passwordHash").value;
-        if(passwordHash.trim() === "") {
-            camposInvalidos.push("Senha");
-        }
-        data["passwordHash"] = passwordHash;        
-        document.getElementById("passwordHash").value = "";
-        
-        if (camposInvalidos.length > 0) {
-            errorContainer.innerText = "Os seguintes campos são obrigatórios: " + camposInvalidos.join(", ");
-            errorContainer.style.display = "block";
-            return;
-        }
-      
-        var jsonData = JSON.stringify(data);
-        var errorContainer = document.getElementById("error-container");
-        //recupera method do form
-        var metodo = document.getElementById("metodo").value;
-        fetch( "${pageContext.request.contextPath}/api/users", {
-            method: metodo,
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: jsonData
-        }).then(response => {              
-            if(response.ok){
-                listarUsuarios();
-                //desabilitar campos de edição
-                for (var i = 0; i < campos.length; i++) {
-                    var campo = campos[i];
-                    document.getElementById(campo).value = "";
-                    document.getElementById(campo).disabled = true;
-                }
-                document.getElementById("passwordHash").disabled=true;
-                document.getElementById("btnSalvar").disabled = true;
-            }             
-        }).catch(error => {              
-            errorContainer.innerText = "Erro: " + error;
-            errorContainer.style.display = "block";
-        });
-    }    
-    
-        </script>
+       
     </head>
     <body>
         <%@include file="WEB-INF/jspf/navbar.jspf"%>
-        <%if(user!=null){ %>
+        <%if(user!=null && user.getRole().equals("ADMIN")){ %>){ %>
         <div class="container">
 
             <div class="row">
@@ -248,7 +70,183 @@
       </div>
             </div>
         </div>
+ <script>
+            var campos = ["name", "login", "role"]; // Especifica as colunas desejadas
+            var titulos = ["Nome", "Login", "Função"]; // Especifica os tí­tulos personalizados
+            var errorContainer ;
+            window.onload = function () {
+                errorContainer = document.getElementById("error-container");
+                errorContainer.style.display = "none";
+                listarUsuarios();
 
+                //desabilitar campos de edição
+                for (var i = 0; i < campos.length; i++) {
+                    var campo = campos[i];
+                    document.getElementById(campo).disabled = true;
+                }
+                document.getElementById("btnSalvar").disabled = true;
+            }
+
+            function listarUsuarios() {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "${pageContext.request.contextPath}/api/users", true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var lista = JSON.parse(xhr.responseText);
+                        var table = exibirDados(lista, campos, titulos);
+                        //registro do evento de click na tabela
+                        table.addEventListener("click", clickGrid);
+                        var container = document.getElementById("dados-container");
+                        // Limpa o conteúdo existente definindo innerHTML como uma string vazia
+                        container.innerHTML = '';
+                        container.appendChild(table);
+                    } else {
+                         if(xhr.status != 200){
+                            errorContainer.innerText = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente mais tarde.";
+                            errorContainer.style.display = "block";
+                         }
+                    }
+                };
+                xhr.send();
+            }
+
+    //funcao para capturar evento de click na tabela
+    function clickGrid(event) {
+        var table = document.getElementById("table");
+        var tr = table.getElementsByTagName("tr");
+        event.target.parentElement.classList.add("destaque2");
+        preencherCampos(event);
+        //habilita campos de edição
+        habilitaCamposEdicao();
+        // Obtém uma referência ao elemento do campo oculto
+        document.getElementById('metodo').value = 'put';
+        // desabilita campo isbn (chave primária)
+        document.getElementById("login").disabled = true;
+        errorContainer.style.display = "none";        
+    }
+    function preencherCampos(event){
+        //preencher campos do formulário com dados da linha selecionada
+        var td = event.target.parentElement.getElementsByTagName("td");
+        for (var i = 0; i < campos.length; i++) {
+            var campo = campos[i];
+            document.getElementById(campo).value = td[i].innerText;
+        }
+    }
+    function habilitaCamposEdicao(){
+        for (var i = 0; i < campos.length; i++) {
+            var campo = campos[i];
+            document.getElementById(campo).removeAttribute("disabled");
+        }        
+        document.getElementById("passwordHash").removeAttribute("disabled");            
+        document.getElementById("btnSalvar").disabled = false;
+        document.getElementById("btnDeletar").disabled = false;
+    }
+
+    function deletarSelectedItemGrid(){
+        var login = document.getElementById("login").value;
+        if(login === ""){
+            return;
+        }        
+        errorContainer.style.display = "none";
+        
+        fetch( "${pageContext.request.contextPath}/api/users/" + login, {
+            method: 'delete',
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(response => {              
+            if(response.ok){
+                listarUsuarios();                   
+                //desabilitar campos de edição
+                for (var i = 0; i < campos.length; i++) {
+                    var campo = campos[i];
+                    document.getElementById(campo).value = "";
+                    document.getElementById(campo).disabled = true;
+                }
+                document.getElementById("passwordHash").disabled=true;
+                document.getElementById("btnSalvar").disabled = true;
+                document.getElementById("btnDeletar").disabled = true;
+            } 
+        }).catch(error => {              
+            errorContainer.innerText = "Erro: " + error;
+            errorContainer.style.display = "block";
+        });
+    }
+
+    function novoForm() {
+        for (var i = 0; i < campos.length; i++) {
+            document.getElementById(campos[i]).value = "";
+            document.getElementById(campos[i]).removeAttribute("disabled");
+        }
+        document.getElementById("passwordHash").value = "";
+        document.getElementById("passwordHash").removeAttribute("disabled");
+
+        document.getElementById("btnSalvar").disabled = false;
+        document.getElementById("error-container").innerHTML = "";
+        var table = document.getElementById("table");
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 0; i < tr.length; i++) {
+            tr[i].classList.remove("destaque2");
+        }
+
+        document.getElementById("btnDeletar").disabled = true;
+        document.getElementById('metodo').value = 'post';
+    }
+    function submitForm() {
+        var data = {};        
+        //validação dos campos do formulário        
+        errorContainer.style.display = "none";
+        var camposInvalidos = [];
+        for (var i = 0; i < campos.length; i++) {
+            var campo = campos[i];
+            var valor = document.getElementById(campo).value;
+            if (valor.trim() === "") {
+              camposInvalidos.push(titulos[i]);
+            }
+            //preenche objeto data com os campos do formulário
+            data[campo] = valor;
+        }
+        var passwordHash = document.getElementById("passwordHash").value;
+        if(passwordHash.trim() === "") {
+            camposInvalidos.push("Senha");
+        }
+        data["passwordHash"] = passwordHash;        
+        document.getElementById("passwordHash").value = "";
+        
+        if (camposInvalidos.length > 0) {
+            errorContainer.innerText = "Os seguintes campos são obrigatórios: " + camposInvalidos.join(", ");
+            errorContainer.style.display = "block";
+            return;
+        }
+      
+        var jsonData = JSON.stringify(data);
+        //recupera method do form
+        var metodo = document.getElementById("metodo").value;
+        fetch( "${pageContext.request.contextPath}/api/users", {
+            method: metodo,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: jsonData
+        }).then(response => {              
+            if(response.ok){
+                listarUsuarios();
+                //desabilitar campos de edição
+                for (var i = 0; i < campos.length; i++) {
+                    var campo = campos[i];
+                    document.getElementById(campo).value = "";
+                    document.getElementById(campo).disabled = true;
+                }
+                document.getElementById("passwordHash").disabled=true;
+                document.getElementById("btnSalvar").disabled = true;
+            }             
+        }).catch(error => {              
+            errorContainer.innerText = "Erro: " + error;
+            errorContainer.style.display = "block";
+        });
+    }    
+    
+        </script>
         <%}%>
         <%@include file="WEB-INF/jspf/html-body-libs.jspf"%>
     </body>
