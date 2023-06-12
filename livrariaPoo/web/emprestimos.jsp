@@ -9,11 +9,14 @@
     <body>
         <%@include file="WEB-INF/jspf/navbar.jspf"%>
         <%if(user!=null){ %>
-            <div class="container">
+            <div class="container d-flex flex-column justify-content-center align-items-center">
                 <h3 class="my-5">Lista de Empréstimos</h2>
-                <div id="dados-container"></div>
+                <div id="dados-container" style="width: 1000px;"></div>
                 <div id="error-container" style="display: none; color: red;"></div>
-                <button class="btn btn-primary" id="btnDevolver" disabled onclick="devolverLivro()">Devolver</button>
+                
+                <%if(user!=null && user.getRole().equals("USER")){ %>
+                    <button class="btn btn-primary" id="btnDevolver" disabled onclick="devolverLivro()">Devolver</button>
+                <%}%>
             </div>
         <script>
             var campos = ["rowId", "dataFormatada", "titulo", "isbn", "login", "name", "dataDevFormatada"]; // Especifica as colunas desejadas
