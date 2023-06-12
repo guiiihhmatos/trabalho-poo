@@ -122,6 +122,7 @@
                 preencherCampos(event);
                 //habilita campos de edição
                 habilitaCamposEdicao();
+                document.getElementById("novo-usuario").classList.remove("d-none");
                 // Obtém uma referência ao elemento do campo oculto
                 document.getElementById('metodo').value = 'put';
                 // desabilita campo isbn (chave primária)

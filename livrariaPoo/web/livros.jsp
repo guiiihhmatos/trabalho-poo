@@ -231,6 +231,7 @@
                 // desabilita campo isbn (chave primária)
                 document.getElementById("isbn").disabled = true;
                 errorContainer.style.display = "none";
+                document.getElementById("novo-livro").classList.remove("d-none");
             }
 
             //funcao para capturar evento de click na tabela
