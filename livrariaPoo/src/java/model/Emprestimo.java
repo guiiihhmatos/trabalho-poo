@@ -67,7 +67,8 @@ public class Emprestimo {
                 + "JOIN livro l ON e.idLivro = l.rowid "
                 + "JOIN users u ON e.IdUsuario = u.rowid " ;
         if(pIdUsuario!=null){
-            query += "Where u.rowid = " + pIdUsuario;
+            query += "Where u.rowid = " + pIdUsuario +
+                     " and e.data_devolucao is null";
         }
         ResultSet rs = stmt.executeQuery(query);
 

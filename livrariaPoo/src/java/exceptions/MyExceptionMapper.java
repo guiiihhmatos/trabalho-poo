@@ -14,6 +14,7 @@ public class MyExceptionMapper implements ExceptionMapper<Exception> {
   @Override
   public Response toResponse(Exception exception) {
     // Cria um objeto JSON com a mensagem de erro
+    exception.printStackTrace();
     JsonObject error = Json.createObjectBuilder()
                            .add("message", exception.getMessage())
                            .build();

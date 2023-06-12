@@ -1,5 +1,7 @@
 package web.app;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -25,16 +27,16 @@ public class AuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        // Verificar se a URL contém /api/ e não é /api/session/
         String requestURI = httpRequest.getRequestURI();
-        if (!requestURI.contains("/session")) {
+        if (!requestURI.contains("/session/authenticate")) {
             // Verificar a autenticação aqui (exemplo: verificar token de acesso)
             if(httpRequest.getSession().getAttribute("user") == null){                
-                String mensagemErro = "Acesso proibido. Você não tem permissão para acessar este recurso.";
+                JsonObject mensagemErro = Json.createObjectBuilder()
+                .add("message", "Acesso proibido. Você não tem permissão para acessar este recurso.")
+                .build();
                 httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                httpResponse.getWriter().write(mensagemErro);                
+                httpResponse.getWriter().write(mensagemErro.toString());                
             }else{
-                // Se a autenticação for válida, permite que a requisição prossiga
                 chain.doFilter(request, response);
             }
             // Caso contrário, redirecionar ou enviar resposta de erro
